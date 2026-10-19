@@ -108,12 +108,19 @@ export async function createOrPatchSession(
 // No recreate needed — platform_config feeds nothing the pipeline computes. Driven by an
 // event so league_settings doesn't import this module (it imports league_settings — a cycle).
 document.addEventListener('platform-connected', () => {
-    const { platform, n_drafters, n_picks, cash_per_team } = getLeagueSettings()
+    const { platform, n_drafters, n_picks, cash_per_team, mode } = getLeagueSettings()
     createOrPatchSession(4, {
         league: { n_drafters, n_picks, cash_per_team },
         slot_counts: getSlotCounts(),
         platform,
         platform_config: getPlatformConfig(),
+    }).then(async () => {
+        if (mode === 'Season Mode') {
+            const { refreshSeasonRostersFromPlatform } = await import('./season_session.js')
+            const { applyLayout } = await import('../layout.js')
+            await refreshSeasonRostersFromPlatform()
+            applyLayout()
+        }
     }).catch(err => console.error('Platform connect patch failed:', err))
 })
 

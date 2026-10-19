@@ -22,7 +22,7 @@ import { buildExpandPanel } from './expand_view.js'
 import { PlayerResult } from '../types.js'
 import { getScoringFormat, getSelectedCategories } from '../parameter_collection/format_and_categories.js'
 import { getLeagueSettings } from '../parameter_collection/league_settings.js'
-import { getShortCategoryNames } from '../app_state.js'
+import { getShortCategoryNames, isPointsMode } from '../app_state.js'
 import { isMobileViewport } from '../helper_functions.js'
 import { buildFullPlayerDisplayHtml } from '../player_display.js'
 
@@ -39,6 +39,7 @@ const SCORE_COL_W_REM  = 1.5
 const CAT_COL_W_REM    = 3      // desired minimum width per category column
 
 function computeContentMinWidth(): string {
+    if (isPointsMode()) return '32rem'
     const isAuction  = (document.getElementById('ls-mode') as HTMLInputElement).value === 'Auction Mode'
     const nScoreCols = isAuction ? 4 : 1
     const categories = getSelectedCategories()
@@ -84,6 +85,7 @@ let highlightedPlayerId: number | null = null
 interface RenderContext {
     categories: string[]
     isAuction:  boolean
+    isPoints:   boolean
     isRoto:     boolean
     rotoData:   { nDrafters: number; rotoMiddle: number } | null
     decimals:   number
@@ -158,7 +160,23 @@ export function buildTableHeader(): void {
         : '14rem'
     headerRow.append(playerTh)
 
-    if (isAuction) {
+    if (isPointsMode()) {
+        const pointsCols = [
+            { label: 'Marginal Δ FP', width: isMobile ? '3.5rem' : '5rem' },
+            { label: 'FP/G', width: isMobile ? '2.5rem' : '3.5rem' },
+            { label: 'Total FP', width: isMobile ? '2.5rem' : '4rem' },
+            { label: 'Games', width: isMobile ? '2rem' : '3rem' },
+            { label: 'Pts / Add', width: isMobile ? '3rem' : '4.5rem' },
+            { label: 'Window Density', width: isMobile ? '3rem' : '4.5rem' },
+        ]
+        for (const col of pointsCols) {
+            const th = document.createElement('th')
+            th.className = 'tableheader'
+            th.textContent = col.label
+            th.style.width = col.width
+            headerRow.append(th)
+        }
+    } else if (isAuction) {
         for (const label of ['Diff.', 'Your $', 'Gnrc. $', 'Orig. $']) {
             const th = document.createElement('th')
             // Dollar headers (Your $, Gnrc. $, Orig. $) get the wrap class so
@@ -178,15 +196,17 @@ export function buildTableHeader(): void {
         headerRow.append(th)
     }
 
-    // On mobile, swap each category's full name for its short form (e.g. "Points"
-    // → "pts") so the headers stay narrow.
-    const shortNames = isMobile ? getShortCategoryNames() : {}
-    for (const category of categories) {
-        const label = shortNames[category] ?? category
-        const th = document.createElement('th')
-        th.className = label.length >= 10 ? 'tableheader colheader-long' : 'tableheader'
-        th.textContent = label
-        headerRow.append(th)
+    if (!isPointsMode()) {
+        // On mobile, swap each category's full name for its short form (e.g. "Points"
+        // → "pts") so the headers stay narrow.
+        const shortNames = isMobile ? getShortCategoryNames() : {}
+        for (const category of categories) {
+            const label = shortNames[category] ?? category
+            const th = document.createElement('th')
+            th.className = label.length >= 10 ? 'tableheader colheader-long' : 'tableheader'
+            th.textContent = label
+            headerRow.append(th)
+        }
     }
 }
 
@@ -198,7 +218,33 @@ function buildRowPairHtml(player: PlayerResult, ctx: RenderContext): string {
     html += `<th class='playerheader'><div class='playerheaderdiv'>${buildFullPlayerDisplayHtml(player.player_id)}<button class='playerpopup'>▶</button></div></th>`
 
     // Score column(s)
-    if (ctx.isAuction) {
+    if (ctx.isPoints) {
+        const delta = player.delta_fp ?? player.marginal_fp ?? 0
+        const deltaSign = delta > 0 ? '+' : ''
+        const deltaStr = `${deltaSign}${delta.toFixed(1)}`
+        html += `<td class='panel-datacell' style='${stat_styler_primary(delta, 10, 0)}; font-weight: 700;'>${deltaStr}</td>`
+
+        const fpg = player.points_per_game ?? 0
+        html += `<td class='panel-datacell celltypeb'>${fpg > 0 ? fpg.toFixed(1) : '—'}</td>`
+
+        const totalFp = player.total_projected_points ?? 0
+        html += `<td class='panel-datacell'>${totalFp > 0 ? totalFp.toFixed(1) : '—'}</td>`
+
+        const games = player.candidate_games ?? (player.daily_deltas ? Object.keys(player.daily_deltas).length : 0)
+        html += `<td class='panel-datacell'>${games > 0 ? games : '—'}</td>`
+
+        const ppa = player.streamer_points_per_add !== undefined
+            ? player.streamer_points_per_add
+            : (games > 0 ? delta / 1 : 0)
+        const ppaSign = ppa > 0 ? '+' : ''
+        const ppaStr = ppa !== 0 ? `${ppaSign}${ppa.toFixed(1)}` : '—'
+        html += `<td class='panel-datacell'>${ppaStr}</td>`
+
+        const densityStr = player.streamer_window_density !== undefined
+            ? `${(player.streamer_window_density * 100).toFixed(0)}%`
+            : (games > 0 ? `${games}g / 7d` : '—')
+        html += `<td class='panel-datacell'>${densityStr}</td>`
+    } else if (ctx.isAuction) {
         const av = player.auction_values
         if (av) {
             const diff = av.your_dollar - av.gnrc_dollar
@@ -215,13 +261,15 @@ function buildRowPairHtml(player: PlayerResult, ctx: RenderContext): string {
         html += `<td class='overallhscore'>${player.h_score.toFixed(1)}</td>`
     }
 
-    // Category win rate cells
-    for (const value of player.win_rates) {
-        if (ctx.rotoData) {
-            const rotoValue = 1 + (value / 100) * (ctx.rotoData.nDrafters - 1)
-            html += `<td class='categoricalRotoHscore' style='${stat_styler_primary(rotoValue, 3 * (ctx.rotoData.nDrafters - 1), ctx.rotoData.rotoMiddle)}'>${rotoValue.toFixed(ctx.decimals)}</td>`
-        } else {
-            html += `<td class='categoricalhscore' style='${stat_styler_primary(value, 3, 50)}'>${value.toFixed(ctx.decimals)}</td>`
+    if (!ctx.isPoints) {
+        // Category win rate cells
+        for (const value of player.win_rates) {
+            if (ctx.rotoData) {
+                const rotoValue = 1 + (value / 100) * (ctx.rotoData.nDrafters - 1)
+                html += `<td class='categoricalRotoHscore' style='${stat_styler_primary(rotoValue, 3 * (ctx.rotoData.nDrafters - 1), ctx.rotoData.rotoMiddle)}'>${rotoValue.toFixed(ctx.decimals)}</td>`
+            } else {
+                html += `<td class='categoricalhscore' style='${stat_styler_primary(value, 3, 50)}'>${value.toFixed(ctx.decimals)}</td>`
+            }
         }
     }
 
@@ -260,6 +308,52 @@ function buildBatchRows(players: PlayerResult[], ctx: RenderContext): CandidateR
     return batch
 }
 
+/** Builds points-mode detail panel inside the expand row. */
+function buildPointsExpandPanel(row: HTMLTableRowElement, player: PlayerResult): void {
+    const td = document.createElement('td')
+    td.colSpan = columnCount
+    td.className = 'expandedview-cell'
+
+    const wrap = document.createElement('div')
+    wrap.style.cssText = 'padding: 12px 16px; display: flex; flex-direction: column; gap: 8px;'
+
+    const title = document.createElement('div')
+    title.style.cssText = 'font-weight: 600; font-size: 0.82rem; color: light-dark(#333, #dde);'
+    const gamesCount = player.candidate_games ?? (player.daily_deltas ? Object.keys(player.daily_deltas).length : 0)
+    title.textContent = `Schedule & Points Breakdown (${gamesCount} game${gamesCount === 1 ? '' : 's'} in window)`
+    wrap.appendChild(title)
+
+    if (player.daily_deltas && Object.keys(player.daily_deltas).length > 0) {
+        const schedTable = document.createElement('table')
+        schedTable.className = 'trade-result-table'
+        schedTable.style.width = 'auto'
+        const thead = schedTable.createTHead()
+        const hrow = thead.insertRow()
+        for (const d of Object.keys(player.daily_deltas)) {
+            const th = document.createElement('th')
+            th.textContent = d.length >= 5 ? d.slice(5) : d
+            hrow.append(th)
+        }
+        const tbody = schedTable.createTBody()
+        const brow = tbody.insertRow()
+        for (const [_, val] of Object.entries(player.daily_deltas)) {
+            const cell = brow.insertCell()
+            cell.textContent = val > 0 ? val.toFixed(1) : '—'
+            if (val > 0) cell.style.cssText = 'font-weight: 600; color: #48bb78;'
+        }
+        wrap.appendChild(schedTable)
+    }
+
+    const streamerMeta = document.createElement('div')
+    streamerMeta.style.cssText = 'font-size: 0.75rem; color: #889;'
+    const delta = player.delta_fp ?? player.marginal_fp ?? 0
+    streamerMeta.textContent = `Marginal Starting Lineup Gain: ${delta >= 0 ? '+' : ''}${delta.toFixed(2)} FP | FP/G: ${(player.points_per_game ?? 0).toFixed(1)} | Total Projected FP: ${(player.total_projected_points ?? 0).toFixed(1)}`
+    wrap.appendChild(streamerMeta)
+
+    td.appendChild(wrap)
+    row.appendChild(td)
+}
+
 /** Opens or closes one candidate's detail panel, then re-syncs the window. On expand we build the panel,
  *  render it (so it is in the DOM), then measure its height for the spacer maths and render once more. */
 function toggleExpand(candidate: CandidateRow, ctx: RenderContext): void {
@@ -275,7 +369,11 @@ function toggleExpand(candidate: CandidateRow, ctx: RenderContext): void {
     } else {
         candidate.expanded = true
         candidate.expandRow.style.display = 'table-row'
-        buildExpandPanel(candidate.expandRow, candidate.player, ctx.categories)
+        if (ctx.isPoints) {
+            buildPointsExpandPanel(candidate.expandRow, candidate.player)
+        } else {
+            buildExpandPanel(candidate.expandRow, candidate.player, ctx.categories)
+        }
         button.classList.add('popup-open')
         windowDirty = true
         renderWindow()                                          // attach the (now-built) expand row
@@ -285,18 +383,22 @@ function toggleExpand(candidate: CandidateRow, ctx: RenderContext): void {
     }
 }
 
+function getCandidateSortScore(p: PlayerResult): number {
+    return isPointsMode() ? (p.delta_fp ?? p.marginal_fp ?? p.points_per_game ?? 0) : p.h_score
+}
+
 /** Merges an already-descending-sorted batch into `candidateRows` (data only — the DOM is synced by
  *  renderWindow). Fast path: the batch ranks entirely at/below the current bottom → append. */
 function mergeBatchData(batch: CandidateRow[]): void {
     if (candidateRows.length === 0) { candidateRows = batch; return }
-    const curMin = candidateRows[candidateRows.length - 1].player.h_score
-    if (batch[0].player.h_score <= curMin) { for (const r of batch) candidateRows.push(r); return }
+    const curMin = getCandidateSortScore(candidateRows[candidateRows.length - 1].player)
+    if (getCandidateSortScore(batch[0].player) <= curMin) { for (const r of batch) candidateRows.push(r); return }
 
     const merged: CandidateRow[] = []
     let i = 0, j = 0
     while (i < candidateRows.length && j < batch.length) {
-        if (candidateRows[i].player.h_score >= batch[j].player.h_score) merged.push(candidateRows[i++])
-        else                                                            merged.push(batch[j++])
+        if (getCandidateSortScore(candidateRows[i].player) >= getCandidateSortScore(batch[j].player)) merged.push(candidateRows[i++])
+        else                                                                                          merged.push(batch[j++])
     }
     while (i < candidateRows.length) merged.push(candidateRows[i++])
     while (j < batch.length)         merged.push(batch[j++])
@@ -447,10 +549,12 @@ export function resetTable(): void {
     tbodyEl = table.createTBody()
     ensureScrollWired()
 
-    const isRoto = getScoringFormat() === 'Rotisserie'
+    const isPoints = isPointsMode()
+    const isRoto = !isPoints && getScoringFormat() === 'Rotisserie'
     renderCtx = {
-        categories: getSelectedCategories(),
-        isAuction:  (document.getElementById('ls-mode') as HTMLInputElement).value === 'Auction Mode',
+        categories: isPoints ? [] : getSelectedCategories(),
+        isAuction:  !isPoints && (document.getElementById('ls-mode') as HTMLInputElement).value === 'Auction Mode',
+        isPoints,
         isRoto,
         // Mobile shows integer-rounded values so columns stay narrow ("47" vs "47.5");
         // desktop keeps 1-decimal precision. H-Score always keeps 1 decimal (see buildRowPairHtml).
@@ -460,7 +564,7 @@ export function resetTable(): void {
                        return { nDrafters, rotoMiddle: (nDrafters - 1) / 2 + 1 } })()
             : null,
     }
-    columnCount = 1 + (renderCtx.isAuction ? 4 : 1) + renderCtx.categories.length
+    columnCount = isPoints ? 7 : (1 + (renderCtx.isAuction ? 4 : 1) + renderCtx.categories.length)
 }
 
 /** Merges one batch of already-H-score-sorted players into the current table.

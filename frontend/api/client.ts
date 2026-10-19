@@ -2,8 +2,9 @@
 // HTTP client for the Fantasy Basketball Optimizer backend.
 // All fetch calls go through this module; callers receive typed results.
 
-import { PlayerResult, PlayerGScore, SessionRequest, SportConfig } from '../types.js'
+import { PlayerResult, PlayerGScore, SessionRequest, SportConfig, LeagueTradeImpact, StreamerOptimizeResponse } from '../types.js'
 import { setPlayerRegistry } from '../player_registry.js'
+import { setScoringSystem } from '../app_state.js'
 
 
 // Empty string = same-origin deployment (frontend and backend served from the same host).
@@ -92,19 +93,25 @@ async function jsonRequest<T>(
 // rendering layer via the session registry.
 /** Converts raw backend Candidate objects to frontend PlayerResult objects, remapping snake_case keys to camelCase. */
 export function candidatesToPlayerResults(candidates: any[]): PlayerResult[] {
-    return candidates.filter(c => c.h_score != null).map((c, i) => ({
+    return candidates.filter(c =>
+        c.h_score != null ||
+        c.points_per_game != null ||
+        c.projected_fp_per_game != null ||
+        c.marginal_fp != null ||
+        c.delta_fp != null
+    ).map((c, i) => ({
         player_id:        c.player_id,
-        h_score:          c.h_score,
-        h_rank:           c.h_rank,
-        g_rank:           i + 1,
-        win_rates:        c.win_rates,
-        category_weights: c.category_weights,
-        g_score_rows: c.g_score_rows.map((r: any) => ({
+        h_score:          c.h_score ?? 0,
+        h_rank:           c.h_rank ?? (c.rank ?? i + 1),
+        g_rank:           c.g_rank ?? (c.rank ?? i + 1),
+        win_rates:        c.win_rates ?? [],
+        category_weights: c.category_weights ?? [],
+        g_score_rows: c.g_score_rows ? c.g_score_rows.map((r: any) => ({
             label:   r.label,
             values:  r.values,
             total:   r.total,
             isTotal: r.is_total,
-        })),
+        })) : [],
         flex_allocations: c.flex_allocations ? {
             base_positions: c.flex_allocations.base_positions,
             rows: c.flex_allocations.rows.map((r: any) => ({
@@ -132,6 +139,14 @@ export function candidatesToPlayerResults(candidates: any[]): PlayerResult[] {
             gnrc_dollar_g: c.auction_values.gnrc_dollar_g,
             orig_dollar_g: c.auction_values.orig_dollar_g,
         } : undefined,
+        // Points mode fields
+        points_per_game:        c.points_per_game ?? c.projected_fp_per_game,
+        total_projected_points: c.total_projected_points ?? c.projected_fp_total,
+        marginal_fp:            c.marginal_fp,
+        delta_fp:               c.delta_fp ?? c.marginal_fp,
+        candidate_games:        c.candidate_games,
+        dropped_games:          c.dropped_games,
+        daily_deltas:           c.daily_deltas,
     }))
 }
 
@@ -196,13 +211,16 @@ function adoptRegistryAndGScores(body: any): PlayerGScore[] {
 export async function createSession(
     req: SessionRequest
     , signal?: AbortSignal
-): Promise<{ session_id: string; categories: string[]; g_scores: PlayerGScore[]; n_players_loaded: number; expires_at: string }> {
+): Promise<{ session_id: string; categories: string[]; g_scores: PlayerGScore[]; n_players_loaded: number; expires_at: string; scoring_system?: 'categories' | 'points' }> {
     const body: any = await jsonRequest(`${BASE_URL}/sessions`, 'Create session', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify(req),
         signal,
     })
+    if (body.scoring_system) {
+        setScoringSystem(body.scoring_system)
+    }
     return { ...body, g_scores: adoptRegistryAndGScores(body) }
 }
 
@@ -266,12 +284,31 @@ export interface TeamTradeResult {
 }
 
 export interface TradeAnalyzeResponse {
-    your_team: TeamTradeResult | null
-    their_team: TeamTradeResult | null
-    error: string | null
+    your_team?: TeamTradeResult | null
+    their_team?: TeamTradeResult | null
+    error?: string | null
+    // Points mode fields
+    scoring_system?: 'categories' | 'points'
+    team_a_pre_fp?: number
+    team_a_post_fp?: number
+    team_a_delta_fp?: number
+    team_a_net_delta_fp?: number
+    team_a_streamer_boost?: number
+    team_b_pre_fp?: number
+    team_b_post_fp?: number
+    team_b_delta_fp?: number
+    team_b_net_delta_fp?: number
+    team_b_streamer_boost?: number
+    is_legal?: boolean
+    rejection_reason?: string | null
+    team_a_opened_spots?: number
+    team_b_opened_spots?: number
+    league_impact?: LeagueTradeImpact | null
+    your_net_delta_fp?: number | null
+    their_net_delta_fp?: number | null
 }
 
-/** Analyzes a trade and returns pre/post H-scores for both teams. */
+/** Analyzes a trade and returns pre/post scores (or points differentials) for both teams. */
 export async function analyzeTrade(
     sessionId: string
     , req: {
@@ -297,10 +334,22 @@ export interface TradeSuggestion {
     receive: number[]
     your_score: number
     their_score: number
+    // Points mode fields
+    partner_team_id?: string
+    user_sends?: number[]
+    partner_sends?: number[]
+    user_gain?: number
+    partner_gain?: number
+    total_gain?: number
+    trade_format?: string
+    user_delta_fp?: number
+    partner_delta_fp?: number
+    analysis?: TradeAnalyzeResponse
 }
 
 export interface TradeSuggestResponse {
     suggestions: TradeSuggestion[]
+    scoring_system?: 'categories' | 'points'
 }
 
 /** Generates trade suggestions for two teams. May take 10-30s. */
@@ -317,6 +366,29 @@ export async function suggestTrades(
     }
 ): Promise<TradeSuggestResponse> {
     return jsonRequest(`${BASE_URL}/sessions/${sessionId}/trade/suggest`, 'Trade suggest', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(req),
+    })
+}
+
+// ── POST /sessions/{id}/streamer/optimize ────────────────────────────────────
+
+/** Optimizes weekly streaming acquisitions and churn schedules for Points mode. */
+export async function optimizeStreamer(
+    sessionId: string
+    , req: {
+        player_assignments: Record<string, number[]>
+        my_team_id: string
+        horizon_days?: number
+        max_acquisitions?: number
+        mode?: string
+        streaming_slots?: number
+        designated_drops?: number[]
+        candidate_limit?: number
+    }
+): Promise<StreamerOptimizeResponse> {
+    return jsonRequest(`${BASE_URL}/sessions/${sessionId}/streamer/optimize`, 'Streamer optimize', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify(req),

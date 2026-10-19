@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from typing import Union
 from fastapi import APIRouter, Depends, HTTPException, Response
 
 from backend.state.session import get_session
@@ -9,13 +10,13 @@ from backend.infra.rate_limit import enforce_rate_limit, COMPUTE_POLICY
 from backend.services.ranking import rank_candidates, UnknownRosterPlayersError
 from backend.infra.server_timing import begin_timing, server_timing_header
 from backend.api.schemas import EvaluateRequest
-from backend.models import EvaluateResponse
+from backend.models import EvaluateResponse, PointsEvaluateResponse
 from backend.api.errors import fail
 
 router = APIRouter()
 
 
-@router.post('/sessions/{session_id}/evaluate', response_model=EvaluateResponse,
+@router.post('/sessions/{session_id}/evaluate', response_model=Union[EvaluateResponse, PointsEvaluateResponse],
              dependencies=[Depends(enforce_rate_limit(COMPUTE_POLICY))])
 def rank_candidates_route(session_id: str, req: EvaluateRequest, response: Response):
     begin_timing()

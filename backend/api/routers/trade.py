@@ -2,19 +2,23 @@
 
 from __future__ import annotations
 
+from typing import Union
 from fastapi import APIRouter, Depends, HTTPException
 
 from backend.state.session import get_session
 from backend.infra.rate_limit import enforce_rate_limit, COMPUTE_POLICY
 from backend.services.trading import run_trade_analyze, run_trade_suggest
 from backend.api.schemas import TradeAnalyzeRequest, TradeSuggestRequest
-from backend.models import TradeAnalyzeResponse, TradeSuggestResponse
+from backend.models import (
+    TradeAnalyzeResponse, TradeSuggestResponse,
+    PointsTradeAnalyzeResponse, PointsTradeSuggestResponse,
+)
 from backend.api.errors import fail
 
 router = APIRouter()
 
 
-@router.post('/sessions/{session_id}/trade/analyze', response_model=TradeAnalyzeResponse,
+@router.post('/sessions/{session_id}/trade/analyze', response_model=Union[TradeAnalyzeResponse, PointsTradeAnalyzeResponse],
              dependencies=[Depends(enforce_rate_limit(COMPUTE_POLICY))])
 def trade_analyze_route(session_id: str, req: TradeAnalyzeRequest):
     session = get_session(session_id)
@@ -38,7 +42,7 @@ def trade_analyze_route(session_id: str, req: TradeAnalyzeRequest):
         raise fail(500, 'Trade analysis failed.')
 
 
-@router.post('/sessions/{session_id}/trade/suggest', response_model=TradeSuggestResponse,
+@router.post('/sessions/{session_id}/trade/suggest', response_model=Union[TradeSuggestResponse, PointsTradeSuggestResponse],
              dependencies=[Depends(enforce_rate_limit(COMPUTE_POLICY))])
 def trade_suggest_route(session_id: str, req: TradeSuggestRequest):
     session = get_session(session_id)

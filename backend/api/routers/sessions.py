@@ -32,13 +32,22 @@ router = APIRouter()
 
 def _build_current_params(req: SessionRequest, all_params: dict) -> dict:
     """Flatten a SessionRequest into the flat current_params dict."""
-    sport      = req.league.sport
-    p          = req.parameters
-    categories = req.league.categories or all_params[sport]['default-categories']
-    n          = req.league.n_drafters
+    sport          = req.league.sport
+    p              = req.parameters
+    scoring_system = req.league.scoring_system   # 'categories' | 'points'
+    categories     = req.league.categories or all_params[sport]['default-categories']
+    n              = req.league.n_drafters
+
+    # Flatten the optional points_config block (None for category sessions).
+    points_config_dict = (
+        req.league.points_config.model_dump()
+        if req.league.points_config is not None
+        else None
+    )
 
     return {
         'sport':            sport,
+        'scoring_system':   scoring_system,
         'is_auction':       req.is_auction,
         'n_drafters':       n,
         'n_picks':          req.league.n_picks,
@@ -67,6 +76,8 @@ def _build_current_params(req: SessionRequest, all_params: dict) -> dict:
         'season':           req.data_source.season,
         'blend_weights':    req.data_source.blend_weights,
         'custom_data_ids':  req.data_source.custom_data_ids,
+        # points-mode configuration (None for category sessions)
+        'points_config':    points_config_dict,
     }
 
 
@@ -182,13 +193,20 @@ def create_session_route(req: SessionRequest, user_key: Optional[str] = Depends(
     except Exception:
         raise fail(500, 'Failed to build projections for this session.')
 
+    is_points = session.current_params.get('scoring_system') == 'points'
+
+    # For points sessions, G-scores don't exist — return an empty list so the
+    # frontend can detect the scoring system from the 'scoring_system' field.
+    g_scores = [] if is_points else _serialize_g_scores(session)
+
     return SessionResponse(
-        session_id=session.id,
-        n_players_loaded=len(session.v0_clean),
-        categories=list(session.current_params['categories']),
-        players=_serialize_player_registry(session),
-        g_scores=_serialize_g_scores(session),
-        expires_at=(datetime.now(timezone.utc) + timedelta(seconds=4 * 3600)).strftime('%Y-%m-%dT%H:%M:%SZ'),
+        session_id       = session.id,
+        n_players_loaded = len(session.v0_clean),
+        scoring_system   = session.current_params.get('scoring_system', 'categories'),
+        categories       = list(session.current_params.get('categories', [])),
+        players          = _serialize_player_registry(session),
+        g_scores         = g_scores,
+        expires_at       = (datetime.now(timezone.utc) + timedelta(seconds=4 * 3600)).strftime('%Y-%m-%dT%H:%M:%SZ'),
     )
 
 

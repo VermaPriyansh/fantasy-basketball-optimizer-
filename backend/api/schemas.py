@@ -26,13 +26,37 @@ class UploadResponse(BaseModel):
 
 # ── /sessions POST ────────────────────────────────────────────────────────────
 
+class PointsConfigRequest(BaseModel):
+    """Points-mode scoring configuration block inside LeagueSettings.
+
+    Required when scoring_system == 'points'.  All fields optional so
+    partial patches can update individual rules without resending everything.
+    """
+    points_input_mode:  str = 'projected_points'   # 'projected_points' | 'raw_stats'
+    projection_basis:   str = 'per_game'           # 'per_game' | 'season_total' | ...
+    # {stat_name: weight}; negative weights are valid.  Required for 'raw_stats' mode.
+    scoring_rules: dict[str, float] = {}
+    # Audit / provenance
+    projection_source: Optional[str] = None   # e.g. 'basketball_monster'
+    season:            Optional[str] = None
+    captured_at:       Optional[str] = None   # ISO-8601 timestamp of the source file
+    # Auction-specific
+    auction_budget:  Optional[int] = None
+    minimum_bid:     int = 1
+    bid_increment:   int = 1
+    savor_enabled:   bool = False
+    savor_noise:     float = 0.0
+
+
 class LeagueSettings(BaseModel):
     sport: str
     n_drafters: int
     n_picks: int
     scoring_format: str
+    scoring_system: str = 'categories'   # 'categories' | 'points'
     categories: list[str] = []
     cash_per_team: Optional[int] = None   # Auction Mode only
+    points_config: Optional[PointsConfigRequest] = None   # points mode only
 
 
 class ModelParameters(BaseModel):
@@ -101,6 +125,7 @@ class PlayerRegistryEntry(BaseModel):
 class SessionResponse(BaseModel):
     session_id: str
     n_players_loaded: int
+    scoring_system: str = 'categories'   # 'categories' | 'points'
     categories: list[str]
     players: list[PlayerRegistryEntry]
     g_scores: list[PlayerGScore]
@@ -113,8 +138,10 @@ class PatchLeague(BaseModel):
     n_drafters: Optional[int] = None
     n_picks: Optional[int] = None
     scoring_format: Optional[str] = None
+    scoring_system: Optional[str] = None
     categories: Optional[list[str]] = None
     cash_per_team: Optional[int] = None
+    points_config: Optional[PointsConfigRequest] = None
 
 
 class PatchRequest(BaseModel):
@@ -177,6 +204,20 @@ class TradeSuggestRequest(BaseModel):
     your_differential_threshold: float = 0.0
     their_differential_threshold: float = -0.20
     ignore_position_check: bool = False
+
+
+# ── /sessions/{id}/streamer/optimize ─────────────────────────────────────────
+
+class StreamerOptimizeRequest(BaseModel):
+    player_assignments: dict[str, list[int]]
+    my_team_id: str
+    horizon_days: int = 7
+    max_acquisitions: int = 7
+    mode: str = 'auto'  # 'auto', 'milp', 'tactical_multi', 'daily_churn'
+    streaming_slots: int = 1
+    designated_drops: Optional[list[int]] = None
+    solver: str = 'ortools'
+    candidate_limit: Optional[int] = 50
 
 
 # ── /platforms/* (live platform integration) ─────────────────────────────────

@@ -66,3 +66,14 @@ testing_files/experiment_report.md
 testing_files/experiment_report.html
 testing_files/experiment_results/
 testing_files/benchmark_history.jsonl
+
+# Agent workspaces and scratch files
+.agent/
+.agents/
+.codex/
+.github/agents/
+.github/hooks/
+.github/skills/
+PROJECT.md
+TEST_INFRA.md
+TEST_READY.md

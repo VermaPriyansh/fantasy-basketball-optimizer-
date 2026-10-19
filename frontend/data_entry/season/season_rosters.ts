@@ -3,7 +3,7 @@
 // inspector table (right).  Used by layout.ts for Season → Rosters tab.
 
 import { makeCustomSelect, CustomSelect } from '../../custom_select.js'
-import { getPlayerResults, getGScoreById, getShortCategoryNames } from '../../app_state.js'
+import { getPlayerResults, getGScoreById, getShortCategoryNames, isPointsMode, getPlayerResultsById } from '../../app_state.js'
 import { getRegistryEntry, findPlayerIdByName } from '../../player_registry.js'
 import { makeFullPlayerDisplay, buildFullPlayerDisplayHtml, buildPlayerOptionLabel } from '../../player_display.js'
 import { isMobileViewport, readRequiredIntInput } from '../../helper_functions.js'
@@ -13,6 +13,8 @@ import { getSelectedCategories, getScoringFormat } from '../../parameter_collect
 import { getLeagueSettings } from '../../parameter_collection/league_settings.js'
 import { stat_styler_primary } from '../../styles/styler_functions.js'
 import { evaluateTeamHScore, getLivePlatformRosters } from '../../api/season_session.js'
+import { getSlotCounts } from '../../parameter_collection/slot_counts.js'
+import type { PlayerResult } from '../../types.js'
 
 // Tracks the change-event listeners attached by the most recent render so they
 // can be removed before the next one. Without this, calling renderSeasonRosters
@@ -38,9 +40,12 @@ export function renderSeasonRosters(leftEl: HTMLElement, rightEl: HTMLElement): 
     const nPicks    = readRequiredIntInput('ls-n-picks')
     const teamNames = (document.getElementById('ls-team-names') as HTMLTextAreaElement)
         .value.split('\n').map(s => s.trim()).filter(Boolean)
-    // Option order follows playerResults (G-rank descending), so the dropdowns list the
-    // best players first; labels come from the registry.
-    const playerOptions = playerResults.map(p => ({
+    // Option order follows playerResults (G-rank descending, or FP/G descending in points mode),
+    // so the dropdowns list the best players first; labels come from the registry.
+    const sortedPlayerResults = isPointsMode()
+        ? [...playerResults].sort((a, b) => (b.points_per_game ?? b.total_projected_points ?? 0) - (a.points_per_game ?? a.total_projected_points ?? 0))
+        : playerResults
+    const playerOptions = sortedPlayerResults.map(p => ({
         value: String(p.player_id)
       , label: buildPlayerOptionLabel(p.player_id)
       , html:  buildFullPlayerDisplayHtml(p.player_id)
@@ -112,7 +117,9 @@ export function renderSeasonRosters(leftEl: HTMLElement, rightEl: HTMLElement): 
             // name missing from the current pool simply leaves the cell blank.
             if (isLivePlatform) {
                 const prefillPlayerId = platformRosters?.[teamNames[d]]?.[r]
-                if (prefillPlayerId !== undefined) sel.setValue(String(prefillPlayerId))
+                if (prefillPlayerId !== undefined && prefillPlayerId !== -1) {
+                    sel.setValue(String(prefillPlayerId))
+                }
             } else {
                 const defaultName = DEFAULT_SEASON_ROSTERS[teamNames[d]]?.[r]
                 if (defaultName) {
@@ -306,7 +313,11 @@ export function renderSeasonRosters(leftEl: HTMLElement, rightEl: HTMLElement): 
         const selectedTeam = teamSel.getValue()
         const teamIdx = teamNames.indexOf(selectedTeam)
         if (teamIdx < 0) { tableContainer.innerHTML = ''; return }
-        buildTeamGScoreTable(teamIdx, selects, nPicks, teamNames, tableContainer)
+        if (isPointsMode()) {
+            buildTeamPointsTable(teamIdx, selects, nPicks, teamNames, tableContainer)
+        } else {
+            buildTeamGScoreTable(teamIdx, selects, nPicks, teamNames, tableContainer)
+        }
     }
 
     // Rebuild when the team selector changes
@@ -500,6 +511,302 @@ async function buildTeamGScoreTable(
     }
 
     container.appendChild(hScoreTbl)
+}
+
+/**
+ * Builds a Points Inspector table for the selected team when in Points mode:
+ * Displays Player name, position, FP/G, total projected FP, and slot status
+ * (Active starter slot vs Bench).
+ */
+function buildTeamPointsTable(
+    teamIdx: number
+    , selects: CustomSelect[][]
+    , nPicks: number
+    , teamNames: string[]
+    , container: HTMLElement
+): void {
+    container.innerHTML = ''
+
+    // Collect players on this team
+    const teamPlayerIds: number[] = []
+    for (let r = 0; r < nPicks; r++) {
+        const playerId = readSelectedPlayerId(selects[r][teamIdx])
+        if (playerId !== null) teamPlayerIds.push(playerId)
+    }
+
+    if (teamPlayerIds.length === 0) return
+
+    let resultsMap: Map<number, PlayerResult> | null = null
+    try {
+        resultsMap = getPlayerResultsById()
+    } catch {
+        resultsMap = null
+    }
+
+    interface PlayerPointsRow {
+        playerId: number
+        name: string
+        positions: string[]
+        fpg: number
+        totalFp: number
+        slotStatus: string
+        isStarter: boolean
+    }
+
+    // Retrieve slot configuration
+    let slotCounts: Record<string, number> = {}
+    try {
+        slotCounts = getSlotCounts()
+    } catch {
+        slotCounts = { PG: 1, SG: 1, SF: 1, PF: 1, C: 1, G: 1, F: 1, UTIL: 3 }
+    }
+
+    // Build ordered list of active slots
+    const baseSlots: string[] = []
+    const flexSlots: string[] = []
+    const utilSlots: string[] = []
+
+    for (const [slot, count] of Object.entries(slotCounts)) {
+        if (slot.toLowerCase() === 'bench' || slot.toLowerCase() === 'ir') continue
+        for (let i = 0; i < count; i++) {
+            const s = slot.toUpperCase()
+            if (['PG', 'SG', 'SF', 'PF', 'C'].includes(s)) {
+                baseSlots.push(s)
+            } else if (['G', 'F'].includes(s)) {
+                flexSlots.push(s)
+            } else {
+                utilSlots.push(s)
+            }
+        }
+    }
+
+    const activeSlotPool: string[] = [...baseSlots, ...flexSlots, ...utilSlots]
+    if (activeSlotPool.length === 0) {
+        activeSlotPool.push('PG', 'SG', 'SF', 'PF', 'C', 'G', 'F', 'UTIL', 'UTIL', 'UTIL')
+    }
+
+    // Sort team players by FP/G descending for starter assignment
+    const candidateRows = teamPlayerIds.map(pid => {
+        const entry = getRegistryEntry(pid)
+        const pr = resultsMap?.get(pid)
+        const fpg = pr?.points_per_game ?? (pr?.total_projected_points ? pr.total_projected_points / 3.5 : 0)
+        const totalFp = pr?.total_projected_points ?? (fpg * 3.5)
+        return {
+            playerId: pid,
+            name: entry.name,
+            positions: entry.positions,
+            fpg,
+            totalFp,
+        }
+    })
+
+    candidateRows.sort((a, b) => b.fpg - a.fpg)
+
+    // Assign slots to players
+    const remainingSlots = [...activeSlotPool]
+    const assignedRows: PlayerPointsRow[] = []
+
+    for (const cand of candidateRows) {
+        let assignedSlotIndex = -1
+        // 1. Try base position match
+        for (let i = 0; i < remainingSlots.length; i++) {
+            const slot = remainingSlots[i]
+            if (cand.positions.includes(slot)) {
+                assignedSlotIndex = i
+                break
+            }
+        }
+        // 2. Try flex position match (G or F)
+        if (assignedSlotIndex === -1) {
+            for (let i = 0; i < remainingSlots.length; i++) {
+                const slot = remainingSlots[i]
+                if (slot === 'G' && (cand.positions.includes('PG') || cand.positions.includes('SG'))) {
+                    assignedSlotIndex = i
+                    break
+                }
+                if (slot === 'F' && (cand.positions.includes('SF') || cand.positions.includes('PF'))) {
+                    assignedSlotIndex = i
+                    break
+                }
+            }
+        }
+        // 3. Try UTIL match
+        if (assignedSlotIndex === -1) {
+            for (let i = 0; i < remainingSlots.length; i++) {
+                if (remainingSlots[i] === 'UTIL') {
+                    assignedSlotIndex = i
+                    break
+                }
+            }
+        }
+
+        if (assignedSlotIndex !== -1) {
+            const slot = remainingSlots.splice(assignedSlotIndex, 1)[0]
+            assignedRows.push({
+                ...cand,
+                slotStatus: `Active (${slot})`,
+                isStarter: true,
+            })
+        } else {
+            assignedRows.push({
+                ...cand,
+                slotStatus: 'Bench',
+                isStarter: false,
+            })
+        }
+    }
+
+    // Build Points Inspector DOM Table
+    const tbl = document.createElement('table')
+    tbl.className = 'panel-table panel-table--rounded'
+    tbl.style.tableLayout = 'fixed'
+    tbl.dataset.testid = 'roster-inspection-points'
+
+    const isMobile = isMobileViewport()
+    const thead = tbl.createTHead()
+
+    // Spacer row
+    const spacerRow = thead.insertRow(-1)
+    spacerRow.style.border = 'none'
+    const spName = makeSpacerTh('panel-colspacer-name')
+    spName.style.width = isMobile ? '7rem' : '180px'
+    const spPos = makeSpacerTh()
+    spPos.style.width = isMobile ? '3rem' : '75px'
+    const spFpg = makeSpacerTh()
+    spFpg.style.width = isMobile ? '3rem' : '75px'
+    const spTot = makeSpacerTh()
+    spTot.style.width = isMobile ? '3.5rem' : '85px'
+    const spSlot = makeSpacerTh()
+    spSlot.style.width = isMobile ? '5.5rem' : '120px'
+    spacerRow.append(spName, spPos, spFpg, spTot, spSlot)
+
+    // Header row
+    const headerRow = thead.insertRow(-1)
+    const thPlayer = document.createElement('th')
+    thPlayer.className = 'panel-colheader'
+    thPlayer.textContent = 'Player'
+    thPlayer.style.textAlign = 'left'
+
+    const thPos = document.createElement('th')
+    thPos.className = 'panel-colheader'
+    thPos.textContent = 'Pos'
+
+    const thFpg = document.createElement('th')
+    thFpg.className = 'panel-colheader'
+    thFpg.textContent = 'FP/G'
+
+    const thTot = document.createElement('th')
+    thTot.className = 'panel-colheader'
+    thTot.textContent = 'Proj FP'
+
+    const thSlot = document.createElement('th')
+    thSlot.className = 'panel-colheader'
+    thSlot.textContent = 'Slot / Status'
+
+    headerRow.append(thPlayer, thPos, thFpg, thTot, thSlot)
+
+    const tbody = tbl.createTBody()
+    let activeFpSum = 0
+    let benchFpSum = 0
+    let activeCount = 0
+
+    for (const row of assignedRows) {
+        const tr = tbody.insertRow(-1)
+
+        const nameCell = document.createElement('th')
+        nameCell.className = 'panel-rowlabel'
+        nameCell.append(makeFullPlayerDisplay(row.playerId))
+        tr.appendChild(nameCell)
+
+        const posCell = tr.insertCell(-1)
+        posCell.className = 'panel-datacell'
+        posCell.textContent = row.positions.join('/')
+
+        const fpgCell = tr.insertCell(-1)
+        fpgCell.className = 'panel-datacell'
+        fpgCell.textContent = row.fpg > 0 ? row.fpg.toFixed(1) : '—'
+
+        const totCell = tr.insertCell(-1)
+        totCell.className = 'panel-datacell celltypea'
+        totCell.textContent = row.totalFp > 0 ? row.totalFp.toFixed(1) : '—'
+
+        const slotCell = tr.insertCell(-1)
+        slotCell.className = 'panel-datacell'
+        const badge = document.createElement('span')
+        if (row.isStarter) {
+            badge.textContent = row.slotStatus
+            badge.style.cssText = 'display:inline-block; padding: 2px 7px; border-radius: 4px; font-weight: 600; font-size: 0.72rem; background: rgba(56, 161, 105, 0.2); color: #48bb78; border: 1px solid rgba(72, 187, 120, 0.4);'
+            activeFpSum += row.totalFp
+            activeCount++
+        } else {
+            badge.textContent = 'Bench'
+            badge.style.cssText = 'display:inline-block; padding: 2px 7px; border-radius: 4px; font-weight: 500; font-size: 0.72rem; background: rgba(160, 174, 192, 0.15); color: #a0aec0; border: 1px solid rgba(160, 174, 192, 0.3);'
+            benchFpSum += row.totalFp
+        }
+        slotCell.append(badge)
+    }
+
+    // Totals rows
+    // Active starters total
+    const activeRow = tbody.insertRow(-1)
+    const activeLabel = document.createElement('th')
+    activeLabel.className = 'panel-rowlabel'
+    activeLabel.textContent = 'Active Starters Total'
+    activeRow.appendChild(activeLabel)
+    activeRow.insertCell(-1).textContent = ''
+    activeRow.insertCell(-1).textContent = ''
+    const activeTotalCell = activeRow.insertCell(-1)
+    activeTotalCell.className = 'panel-datacell celltypeb'
+    activeTotalCell.textContent = activeFpSum.toFixed(1)
+    const activeStatusCell = activeRow.insertCell(-1)
+    activeStatusCell.className = 'panel-datacell'
+    activeStatusCell.textContent = `${activeCount} Starters`
+
+    // Bench total
+    const benchRow = tbody.insertRow(-1)
+    const benchLabel = document.createElement('th')
+    benchLabel.className = 'panel-rowlabel'
+    benchLabel.textContent = 'Bench Total'
+    benchRow.appendChild(benchLabel)
+    benchRow.insertCell(-1).textContent = ''
+    benchRow.insertCell(-1).textContent = ''
+    const benchTotalCell = benchRow.insertCell(-1)
+    benchTotalCell.className = 'panel-datacell'
+    benchTotalCell.textContent = benchFpSum.toFixed(1)
+    const benchStatusCell = benchRow.insertCell(-1)
+    benchStatusCell.className = 'panel-datacell'
+    benchStatusCell.textContent = `${assignedRows.length - activeCount} Bench`
+
+    // Full roster total
+    const totalRow = tbody.insertRow(-1)
+    const totalLabel = document.createElement('th')
+    totalLabel.className = 'panel-rowlabel'
+    totalLabel.textContent = 'Team Projected FP'
+    totalRow.appendChild(totalLabel)
+    totalRow.insertCell(-1).textContent = ''
+    totalRow.insertCell(-1).textContent = ''
+    const totalCell = totalRow.insertCell(-1)
+    totalCell.className = 'panel-datacell celltypeb'
+    totalCell.textContent = (activeFpSum + benchFpSum).toFixed(1)
+    totalRow.insertCell(-1).textContent = ''
+
+    container.appendChild(tbl)
+
+    // Matchup Points Summary Card
+    const summaryCard = document.createElement('div')
+    summaryCard.className = 'panel-table panel-table--rounded panel-table--top-gap'
+    summaryCard.style.cssText = 'padding: 12px 16px; background: light-dark(#f8fafc, #161a23); border: 1px solid light-dark(#e2e8f0, #2b3040); border-radius: 6px; display: flex; justify-content: space-between; align-items: center;'
+    summaryCard.innerHTML = `
+        <div>
+            <div style="font-size: 0.72rem; color: #889; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Weekly Starting Lineup Projected Points</div>
+            <div style="font-size: 1.35rem; font-weight: 700; color: #48bb78;">${activeFpSum.toFixed(1)} <span style="font-size: 0.8rem; font-weight: normal; color: #889;">FP</span></div>
+        </div>
+        <div style="text-align: right;">
+            <div style="font-size: 0.72rem; color: #889; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Active Lineup Slots</div>
+            <div style="font-size: 0.95rem; font-weight: 600; color: light-dark(#333, #dde);">${activeCount} of ${assignedRows.length} Rostered</div>
+        </div>
+    `
+    container.appendChild(summaryCard)
 }
 
 /** Creates an invisible `<th>` spacer to lock column widths in panel tables. */
