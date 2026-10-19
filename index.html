@@ -1,0 +1,782 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      
+        <link rel="next" href="league-setup/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="img/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Fantasy Basketball Optimization</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#fantasy-basketball-optimization" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="." title="Fantasy Basketball Optimization" class="md-header__button md-logo" aria-label="Fantasy Basketball Optimization" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Fantasy Basketball Optimization
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Home
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="." title="Fantasy Basketball Optimization" class="md-nav__button md-logo" aria-label="Fantasy Basketball Optimization" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Fantasy Basketball Optimization
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="." class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Introduction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#technical-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#settings-glossary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Settings glossary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parameter-glossary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameter glossary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="league-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    League Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="projections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Player Stats
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="hscores/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    H-scoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="gscores/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    G-scores
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="drafts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Draft Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="auctions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Auction Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="season/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Season Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Introduction
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#technical-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#settings-glossary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Settings glossary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parameter-glossary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameter glossary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="fantasy-basketball-optimization">Fantasy Basketball Optimization</h1>
+<h2 id="introduction">Introduction</h2>
+<p>This is documentation for a <a href="https://fantasy-basketball-optimizer-281850565831.us-east1.run.app/">website</a> which applies an algorithm called <a href="hscores/">H-scoring</a> to category-based fantasy basketball. The algorithm provides recommendations for which players to choose based on their statistical profiles and how they synergize with existing teams. </p>
+<p>H-scoring takes two essential inputs. One is <a href="league-setup/">league context</a>- which players are getting selected by which teams. The website allows you to either integrate with a real <a href="league-setup/#fantasy-provider-connections">fantasy league</a> or <a href="league-setup/#manual-entry">update picks manually</a>. The other essential input is <a href="projections/">player stats</a>. When you connect to a platform, those come from external projections; in manual mode you can use external projections too, or data from past NBA seasons. </p>
+<p>The algorithm is primarily designed for <a href="drafts/">drafting</a>, but can be applied in the context of <a href="auctions/">auctions</a> and <a href="season/">ongoing seasons</a> as well. </p>
+<figure>
+<p><img alt="The website in draft mode" src="img/main.png" /></p>
+<figcaption>
+<p>The website in drafting mode, with manual player entry.</p>
+</figcaption>
+</figure>
+<p>Please note that the algorithm is based on a simplified model of fantasy basketball, ignoring many practical considerations, and there is no guarantee that using it will lead to success. Don't expect to automatically win your league with it or even to have a better shot than anyone else.</p>
+<h2 id="technical-reference">Technical reference</h2>
+<p>Source code is available <a href="https://github.com/zer2/fantasy-basketball-optimizer">here</a>. Relevant math is described in these papers: </p>
+<ul>
+<li><a href="https://arxiv.org/abs/2307.02188">Improving algorithms for fantasy basketball</a></li>
+<li><a href="https://arxiv.org/abs/2409.09884">Dynamic algorithms for fantasy basketball</a></li>
+<li><a href="https://arxiv.org/abs/2501.00933">Optimizing for Rotisserie fantasy basketball</a></li>
+</ul>
+<h2 id="settings-glossary">Settings glossary</h2>
+<p>Settings, available in the left sidebar, control the context in which the algorithm operates.  </p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Options</th>
+<th>Explained in</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mode</td>
+<td>Toggle between Draft/Auction/Season modes</td>
+<td><a href="drafts/">Draft</a>, <a href="auctions/">Auction</a>, <a href="season/">Season</a></td>
+</tr>
+<tr>
+<td>Data source</td>
+<td>Connect to a platform (Yahoo, Fantrax, ESPN) or enter picks manually</td>
+<td><a href="league-setup/">League Setup</a></td>
+</tr>
+<tr>
+<td>Drafters and picks</td>
+<td>Number of drafters and picks per drafter (manual entry)</td>
+<td><a href="league-setup/#manual-entry">League Setup → Manual entry</a></td>
+</tr>
+<tr>
+<td>Third-round reversal</td>
+<td>Snake-draft order toggle (manual entry)</td>
+<td><a href="league-setup/#manual-entry">League Setup → Manual entry</a></td>
+</tr>
+<tr>
+<td>Player stats</td>
+<td>Configure forward-looking projections, or data from past NBA seasons</td>
+<td><a href="projections/">Player Stats</a></td>
+</tr>
+<tr>
+<td>Scoring format</td>
+<td>Toggle between Head to Head and Rotisserie, and — for Head to Head — slide between scoring each category and winning the majority</td>
+<td><a href="hscores/#main-h-score-table">H-scoring → Main H-score table</a></td>
+</tr>
+<tr>
+<td>Categories</td>
+<td>Select statistical categories for scoring</td>
+<td><a href="hscores/#main-h-score-table">H-scoring → Main H-score table</a></td>
+</tr>
+<tr>
+<td>Tiebreaker</td>
+<td>Define a category to break ties for majority scoring with an even number of categories</td>
+<td><a href="hscores/#head-to-head-most-categories">H-scoring → Most Categories</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="parameter-glossary">Parameter glossary</h2>
+<p>The website's calculations take a number of user-configurable parameters, available through the left sidebar and explained in relevant documentation sections.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Controls</th>
+<th>Explained in</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M (pool size)</td>
+<td>How many reasonable players are available per pick in the future pick model. Effectively, a punting aggressiveness dial</td>
+<td><a href="hscores/#h-scoring-parameters">H-scoring → H-scoring parameters</a></td>
+</tr>
+<tr>
+<td>C (confidence)</td>
+<td>Confidence in other drafters using an H-scoring like algorithm. 0 -&gt; neutral, 1 -&gt; using H-scoring</td>
+<td><a href="hscores/#adjusting-for-other-managers-strategies">H-scoring → Adjusting for other managers' strategies</a></td>
+</tr>
+<tr>
+<td>λ (lambda)</td>
+<td>How strongly early-round category weights are held near balanced, preserving room to pivot</td>
+<td><a href="hscores/#incentivizing-flexible-builds">H-scoring → Incentivizing flexible builds</a></td>
+</tr>
+<tr>
+<td>Weight pinning</td>
+<td>Whether category weights can be fixed by hand, in boxes at the top of the H-score table. Categories left on "auto" are optimized as normal</td>
+<td><a href="hscores/#category-weights">H-scoring → Category weights</a></td>
+</tr>
+<tr>
+<td>Number of iterations</td>
+<td>How long the H-scoring algorithm runs</td>
+<td><a href="hscores/#h-scoring-parameters">H-scoring → H-scoring parameters</a></td>
+</tr>
+<tr>
+<td>Position requirements</td>
+<td>The roster/position structure a team must satisfy</td>
+<td><a href="hscores/#position-structure">H-scoring → Position structure</a></td>
+</tr>
+<tr>
+<td>υ, ψ (upsilon, psi)</td>
+<td>How projections account for injuries and replacement players</td>
+<td><a href="projections/#injury-handling">Player Stats → Injury handling</a></td>
+</tr>
+<tr>
+<td>ℶ (beth)</td>
+<td>How strongly a team's projected strength is regressed toward average</td>
+<td><a href="hscores/#reducing-over-confidence-in-the-projection-set">H-scoring → Reducing over-confidence in the projection set</a></td>
+</tr>
+<tr>
+<td>χ, ℵ (chi, aleph)</td>
+<td>Rotisserie projection uncertainty and cross-category correlation</td>
+<td><a href="projections/#projection-uncertainty">Player Stats → Projection uncertainty</a></td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(S_\sigma\)</span> (S-sigma)</td>
+<td>The spread of auction dollar values across a season (SAVOR)</td>
+<td><a href="auctions/#the-savor-adjustment">Auction Mode → The SAVOR adjustment</a></td>
+</tr>
+<tr>
+<td>Trade thresholds</td>
+<td>Which candidate trades are considered and shown</td>
+<td><a href="season/#trade-suggestions">Season Mode → Trade suggestions</a></td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": [], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,812 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../drafts/">
+      
+      
+        <link rel="next" href="../season/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../img/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Auction Mode - Fantasy Basketball Optimization</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#auction-mode" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Fantasy Basketball Optimization" class="md-header__button md-logo" aria-label="Fantasy Basketball Optimization" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Fantasy Basketball Optimization
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Auction Mode
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Fantasy Basketball Optimization" class="md-nav__button md-logo" aria-label="Fantasy Basketball Optimization" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Fantasy Basketball Optimization
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../league-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    League Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../projections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Player Stats
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hscores/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    H-scoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gscores/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    G-scores
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../drafts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Draft Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Auction Mode
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Auction Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#using-auction-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using auction mode
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Using auction mode">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#manual-entry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Manual entry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#live-connection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Live connection
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quantifying-auction-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quantifying auction value
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quantifying auction value">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#converting-g-score-value-to-dollar-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Converting G-score value to dollar value
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#converting-h-score-value-to-dollar-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Converting H-score value to dollar value
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-savor-adjustment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The SAVOR adjustment
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../season/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Season Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#using-auction-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using auction mode
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Using auction mode">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#manual-entry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Manual entry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#live-connection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Live connection
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quantifying-auction-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quantifying auction value
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quantifying auction value">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#converting-g-score-value-to-dollar-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Converting G-score value to dollar value
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#converting-h-score-value-to-dollar-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Converting H-score value to dollar value
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-savor-adjustment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The SAVOR adjustment
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="auction-mode">Auction Mode</h1>
+<p>Auction drafters need to decide how much to bid on players, not just which players to take. That makes a pure rank ordering, like what is produced for snake drafting, insufficient for strategic decision making in the auction context. </p>
+<p>To be helpful for auctions, the website leverages the machinery of H-scoring to estimate player values both generically and for the manager in question's team. This gives managers both overall value estimates of how much they should be willing to bet on players, and also a sense of which players benefit them more than they benefit the field. Even if the exact dollar values are inexact, the differentials between personal and generic value can point towards players to bid for. </p>
+<h2 id="using-auction-mode">Using auction mode</h2>
+<p>When the selected mode from the left sidebar is 'Auction Mode', the website will provide analysis for either synthetic or live auctions. </p>
+<h3 id="manual-entry">Manual entry</h3>
+<p><img alt="Manual auction entry table" src="../img/mauction.png" /></p>
+<p>Player selection information can be entered into the table through the selectors above it. There is no autodrafting option because the website does not simulate actual auctions, it only provides reference material for a given auction state. </p>
+<h3 id="live-connection">Live connection</h3>
+<p>Yahoo auctions can be integrated with the website, like drafts. </p>
+<p>For some reason, Yahoo's API does not return anything for auctions until a few minutes after the auction has started. Because of that, the displayed values may be the default values for the first few picks. Besides that, the integration works much the same way as for drafting mode. </p>
+<h2 id="quantifying-auction-value">Quantifying auction value</h2>
+<p>The concept of estimating player values for auctions is not new. A well known heuristic is described in many places including <a href="https://www.rotowire.com/basketball/article/nba-auction-strategy-part-2-21393">this article from rotowire</a>. It converts player strength quantified by something like Z-score into an equivalent dollar value, and it is the basis for evaluating players in the auction context. </p>
+<p>The standard method for estimating auction value is</p>
+<ol>
+<li>Calculate the replacement-level score. That is, if 156 players will be chosen, the 157th-highest score is the replacement value</li>
+<li>Adjust all scores by subtracting out the replacement-level value. If this would make a score go below zero, set it to zero instead</li>
+<li>Calculate the sum of scores above replacement. This is the total amount of real value available in the auction</li>
+<li>Divide the total number of dollars available by the total amount of real value available. This yields a conversion rate from score above replacement to dollars</li>
+<li>Multiply each players' score above replacement with the conversion rate calculated in the previous step. The result is each players' auction value</li>
+</ol>
+<p>This process ensures both that players' dollar values are proportional to their values over replacement, and that the total of all players' dollar values are equal to the total amount of $ available. </p>
+<p>The website uses a few different variations of this idea. Five different dollar value estimates can be found within players' detailed drop-downs. </p>
+<figure>
+<p><img alt="Auction candidate detail drop-down" src="../img/auctiondetail.png" /></p>
+<figcaption>
+<p>All of the computed dollar estimates, from a detailed drop-down.</p>
+</figcaption>
+</figure>
+<h3 id="converting-g-score-value-to-dollar-value">Converting G-score value to dollar value</h3>
+<p>The two $ value estimates for G-scores are the easiest to explain. Using any static ranking system to evaluate players is problematic, for reasons described in the <a href="../gscores/">G-score</a> section. However, many auction drafters likely make bidding decisions based on static value, which motivates including that information for context. </p>
+<p>'Orig. $' value, or original value, is the auction value heuristic described above applied to total G-score on all players in the league. Original values do not change during auctions, and can be helpful as objective benchmarks that quantify how good deals are in the abstract. </p>
+<p>'Gnrc. $' value, or generic value, is a variant which is recomputed as players are taken and the amount of available money decreases. For example if two players out of 156 have been taken for $200 total, those two players are removed from the list, the replacement-level value becomes the 155th-highest score, and 200 dollars are removed from the amount of total dollars available. The same process as for original value is then applied using the modified inputs. Generic value can be useful strategically because it reflects whether other drafters have been under- or over-spending. E.g. if drafters have been underspending, it implicitly takes into account the fact that some drafters have excess money and will be able to pay more for remaining players. </p>
+<h3 id="converting-h-score-value-to-dollar-value">Converting H-score value to dollar value</h3>
+<p>The dollar estimates based on H-scores are more aligned with real value, and are featured more centrally on the website than the estimates based on G-scores. In addition to being available within player drop-downs, the H-score estimates are also shown in the main candidate table. </p>
+<p>The H-score-based estimates are also somewhat more complicated than the G-score equivalents. </p>
+<figure>
+<p><img alt="H-score-based dollar values" src="../img/hdollars.png" /></p>
+<figcaption>
+<p>H-score-based $ values for a manager who has already taken Jokic.</p>
+</figcaption>
+</figure>
+<p>H-scores are probabilities, not general values. They are converted into dollar values with two steps</p>
+<ol>
+<li>It is estimated how much money it would take to improve winning chances by the same amount as taking each player</li>
+<li>Those monetary estimates are re-scaled with the auction value heuristic as described previously</li>
+</ol>
+<p>Like for G-scores, the 'Orig. $' values are processed once with the auction value heuristic and stay the same throughout the auction. Neither step 1 nor step 2 changes. Since the values never change, the total value of 'Orig. $' left in a draft does not necessarily add up to the amount of money teams have left to spend. </p>
+<p>For 'Gnrc. $' value, the underlying step 1 estimates are not changed, but the step 2 process is adjusted for the number of players remaining etc. That is, if a player worth $30 of original value is still available, that number will continue to be plugged in as a value to the auction value heuristic process. That way, the total 'Gnrc. $' value left in the draft will always equal the amount of money managers have left to spend. </p>
+<p>For 'Your $', both step 1 and step 2 are re-run based on auction context for the manager in question. It is the only valuation that takes context, like the team's punt build, into consideration. </p>
+<p>The difference between 'Your $' and 'Gnrc. $', the 'Diff.' column,  highlights players which are more or less valuable to the drafter in question than they are to a generic drafter. Players with high values for 'Diff.' are likely sensible targets, while players with low values are anti-synergistic. </p>
+<p><strong>The long and short of it is: 'Your $' is a reasonable benchmark for what you should be willing to pay for a player. 'Diff.' highlights players that are particularly good for your team. 'Orig. $' is a context-agnostic benchmark of what constitutes a good deal for the player</strong></p>
+<h3 id="the-savor-adjustment">The SAVOR adjustment</h3>
+<p>After the previously described processing for H-score and G-score dollar values, the website makes an additional adjustment called SAVOR. It is reflected in all of the displayed dollar values. </p>
+<p>SAVOR stands for Streaming-Adjusted Value Over Replacement. It adjusts for the fact that the lowest-ranking players are highly likely to be shuffled around over the course of the season through waiver wires and free agency, so it is not worth spending much money on them, even if theoretically they are projected to be somewhat more valuable than their alternatives. The general concept is known within the fantasy basketball community- for example it is referenced in this <a href="https://www.reddit.com/r/fantasybball/comments/16se6gt/auction_draft_observationsdata/">reddit thread</a>. Low-value players are likely to be shifted around after snake drafts too, but there is no reason to actually make the SAVOR adjustment in the snake drafting context, because it is a monotonic transformation that would never influence candidate order. That is why it is unique to the auction context. </p>
+<figure>
+<video controls preload="metadata" width="100%" poster="../videos/savor-poster.jpg">
+    <source src="../videos/savor.mp4" type="video/mp4">
+</video>
+<figcaption>
+<p>Why value concentrates at the top of an auction: a player's season is a distribution rather than
+a single number, and anyone below replacement level can be swapped out from the waiver wire, so
+the downside is capped and the upside is not.</p>
+</figcaption>
+</figure>
+<p>SAVOR takes an input parameter, <span class="arithmatex">\(S_{\sigma}\)</span> (S-sigma). It controls the degree to which players are expected to move up and down in dollar value across the season according to the SAVOR model. Its default value of 10 is sourced by vibes- different values may be just as or more reasonable. </p>
+<details class="note">
+<summary>What is the theoretical framework behind the SAVOR calculation?</summary>
+<p>Details of the SAVOR adjustment are included in the appendix of <a href="https://arxiv.org/abs/2307.02188v4">an old version of the first paper</a>. It was removed from the most recent version because it was not topical to the main point of the paper. </p>
+<p>The first foundational idea is to model observations of player values as noisy estimates, which are resolved once the season begins. If a player is projected to be valuable before the draft but ends up being below replacement-level during the season, they will be replaced by a replacement-level player. </p>
+<p>The second foundational idea is that value during an auction is relative to a player that could be picked up at the end for essentially no cost. These players are not useless- it is possible that they could end up being more valuable than projected, and turn into a meaningful asset. </p>
+<p>Assuming that error between projected and realized value is a Normal distribution with a constant scale allows this situation to be modeled mathematically with relative ease. The result is the following formula </p>
+<div class="arithmatex">\[
+\mu \Phi\left(\frac{\mu}{\sigma}\right) - \frac{\sigma}{\sqrt{2\pi}}\left(1 - e^{-\frac{\mu^2}{2\sigma^2}}\right)
+\]</div>
+<p>This does not lend itself to intuition, but the simple explanation is that as the scale parameter is turned up, players projected to be valuable become even more valuable than their projection. The reason is that the small bump in mean expectation from a low value player versus a tail-end-of-the-auction player doesn't mean as much as a bump in mean expectation for a high-value player, because a significant fraction of the time, the real value of a low-value player will dip below the replacement threshold. That is highly unlikely to happen for high-value players.</p>
+<p><img alt="Pre- and post-SAVOR value table" src="../img/savor.png" /></p>
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

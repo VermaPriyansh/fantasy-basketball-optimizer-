@@ -1,0 +1,1511 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../projections/">
+      
+      
+        <link rel="next" href="../gscores/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../img/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>H-scoring - Fantasy Basketball Optimization</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#h-scoring" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Fantasy Basketball Optimization" class="md-header__button md-logo" aria-label="Fantasy Basketball Optimization" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Fantasy Basketball Optimization
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              H-scoring
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Fantasy Basketball Optimization" class="md-nav__button md-logo" aria-label="Fantasy Basketball Optimization" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Fantasy Basketball Optimization
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../league-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    League Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../projections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Player Stats
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    H-scoring
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    H-scoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#main-h-score-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Main H-score table
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Main H-score table">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#head-to-head-most-categories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Head to Head: Most Categories
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rotisserie" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rotisserie
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#detailed-drop-down" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Detailed drop-down
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Detailed drop-down">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#expectations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expectations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#category-weights" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Category weights
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flex-position-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flex position strategy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#roster-allocation-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Roster allocation strategy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-team" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example team
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#input-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Input parameters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Input parameters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#h-scoring-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        H-scoring parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#position-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Position structure
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#corrections" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Corrections
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Corrections">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#reducing-over-confidence-in-the-projection-set" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reducing over-confidence in the projection set
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#incentivizing-flexible-builds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Incentivizing flexible builds
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adjusting-for-other-managers-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adjusting for other managers' strategies
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#checking-multiple-potential-builds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Checking multiple potential builds
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adjusting-percentage-categories-for-volume" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adjusting percentage categories for volume
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other-limitations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other limitations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Other limitations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constant-categorical-variance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Constant categorical variance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#simplified-player-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Simplified player model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#incomplete-fantasy-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Incomplete fantasy model
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gscores/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    G-scores
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../drafts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Draft Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../auctions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Auction Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../season/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Season Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#main-h-score-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Main H-score table
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Main H-score table">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#head-to-head-most-categories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Head to Head: Most Categories
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rotisserie" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rotisserie
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#detailed-drop-down" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Detailed drop-down
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Detailed drop-down">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#expectations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expectations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#category-weights" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Category weights
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flex-position-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flex position strategy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#roster-allocation-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Roster allocation strategy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-team" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example team
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#input-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Input parameters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Input parameters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#h-scoring-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        H-scoring parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#position-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Position structure
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#corrections" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Corrections
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Corrections">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#reducing-over-confidence-in-the-projection-set" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reducing over-confidence in the projection set
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#incentivizing-flexible-builds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Incentivizing flexible builds
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adjusting-for-other-managers-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adjusting for other managers' strategies
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#checking-multiple-potential-builds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Checking multiple potential builds
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adjusting-percentage-categories-for-volume" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adjusting percentage categories for volume
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other-limitations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other limitations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Other limitations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constant-categorical-variance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Constant categorical variance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#simplified-player-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Simplified player model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#incomplete-fantasy-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Incomplete fantasy model
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="h-scoring">H-scoring</h1>
+<p>The heart of the website is an algorithmic framework dubbed H-scoring. It evaluates and ranks potential player picks based on drafting context, as first described in <a href="https://arxiv.org/abs/2409.09884">this paper</a>.</p>
+<p>In short, for each candidate player, it optimizes for future draft pick strategy and estimates performance based on those strategies. This allows the algorithm to understand strategic drafting concepts, including </p>
+<ul>
+<li>Punting (strategically sacrificing) some categories to earn a consistent edge in the rest </li>
+<li>Prioritizing balance among the categories it chooses to compete in, avoiding "overkill" into categories it already has shored up </li>
+<li>Considering the opportunity cost of taking roster slots for particular positions </li>
+</ul>
+<h2 id="main-h-score-table">Main H-score table</h2>
+<p>The main H-score table is the focal point of the website. It lists players in order of their H-score rank, along with additional detail.</p>
+<p>By default, the H-scoring table applies Head to Head: Each Category scoring. It can also be blended with Head to Head: Most Categories scoring, or switched to Rotisserie through the sidebar.</p>
+<figure>
+<p><img alt="The Format &amp; Categories sidebar section" src="../img/formatpanel.png" /></p>
+<figcaption>
+<p>The Head to Head controls. Rotisserie is the other scoring format option.</p>
+</figcaption>
+</figure>
+<p>For all of the formats, the website supports any combination of categories, across the standard nine categories and several alternative options. By default the nine standard categories are selected: Field Goal %, Free Throw %, Threes, Points, Rebounds, Assists, Steals, Blocks, and Turnovers. For the alternative categories, when using projections, make sure to include them when sourcing the projections. ESPN and DARKO do not forecast them so all of the weight will be from Hashtag or BBM projections. </p>
+<figure>
+<p><img alt="Each Category H-score table" src="../img/hec.png" /></p>
+<figcaption>
+<p>Top H-scores for the first pick, 2024-25 season, with default settings including Each Category scoring.</p>
+</figcaption>
+</figure>
+<p>The overall H-score on the left side of the display is both the metric that H-scoring is trying to optimize with its future draft pick strategy, and the one used to rank players. It is the output of the full H-scoring function, which has three components: category strength expectations, category-level victory probabilities, and the outer-level objective function. The decisions made by the algorithm impact the category strength expectations, which in turn impact category-level victory probabilities, which in turn impact the outer-level objective function. </p>
+<p>While the spinner is up, the algorithm is iterating, attempting to repeatedly improve its solution. Mathematically, the underlying iteration process is based on a procedure called gradient descent (or ascent). </p>
+<figure>
+<video controls preload="metadata" width="100%" poster="../videos/gradient-descent-poster.jpg">
+    <source src="../videos/gradient-descent.mp4" type="video/mp4">
+</video>
+<figcaption>
+<p>A simple demonstration of the algorithm using gradient ascent to optimize two input parameters, which are weights for two categories.</p>
+</figcaption>
+</figure>
+<p>Gradient descent is possible whenever the underlying function that is being optimized has a defined slope (or gradient). The H-scoring function is defined in such a way that all of its constituent functions have gradients, which can be composed together. </p>
+<details class="note">
+<summary>How exactly does the algorithm use gradient descent?</summary>
+<p>The algorithm does not use "vanilla" gradient descent. It uses a variant called Adam which has additional logic around how to scale the step size in each direction. </p>
+<p><iframe
+  width="100%"
+  height="450"
+  src="https://www.youtube.com/embed/JXQT_vxqwIs?si=fr4j2rXeNIiLNybX"
+  title="YouTube video player"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  allowfullscreen>
+</iframe></p>
+<p>Adam takes a learning rate as a parameter. Learning rates for different kinds of input (category weights and flex shares) are hard-coded into the model and not user-settable. </p>
+</details>
+<p>One might note that Giannis Antetokounmpo ranks seventh by H-score. Fantasy veterans will be familiar with Giannis for being undervalued by static ranking systems like overall Z-score, because so much of his value is contingent on punting Free Throw %. H-scoring understands this punting strategy, and evaluates Giannis more appropriately.</p>
+<p>The colored numbers to the right are category-level H-scores. They are <em>not direct reflections of the candidate player's characteristics</em>. Instead, they show what the algorithm expects the average win rate against all opponents will be, assuming the candidate player is taken (with continuous modeling, ties have zero probability). H-scoring calculates those expectations based on not just the characteristics of the candidate player, but also on previously chosen players and potential future picks. The statistics of future picks are estimated based on H-scoring's preferred strategy for future picks.</p>
+<p>Because other picks are taken into account, the categorical strengths and weaknesses presented in the H-score table are often quite different from those of the candidate players. For example, Shai Gilgeous-Alexander's row as a candidate for first pick shows a low probability of winning the Threes category, despite SGA hitting a decent number himself. This is because H-scoring's preferred strategy with SGA involves deprioritizing threes with future picks.</p>
+<p>In later draft rounds, the importance of previously chosen players increases and the importance of the strategy for future picks decreases. Also, the strategy for future picks tends to become more stable across players, since the direction of the team is already decided. So categorical H-scores tend to become more consistent across candidate players as the draft goes on.</p>
+<figure>
+<p><img alt="Round seven H-score table" src="../img/hec2.png" /></p>
+<figcaption>
+<p>Top H-scores for a round seven pick in a mock draft, with relatively stable scores across categories. Each Category, 2024-25.</p>
+</figcaption>
+</figure>
+<p>Most of the time, the algorithm punts some number of categories, reflected by low H-scores in those categories. For the categories it does not punt, it tries to be above average without going overboard. The algorithm is not told to punt: it learns that it should from the structure of fantasy basketball. </p>
+<figure>
+<video controls preload="metadata" width="100%" poster="../videos/punting-poster.jpg">
+    <source src="../videos/punting.mp4" type="video/mp4">
+</video>
+<figcaption>
+<p>A demonstration of the fundamental concepts around punting, explaining why the algorithm often sees it as optimal.</p>
+</figcaption>
+</figure>
+<p>The exact degree to which punting is beneficial depends on many factors- the scoring format, correlations between categories, etc. </p>
+<h3 id="head-to-head-most-categories">Head to Head: Most Categories</h3>
+<p>An alternative to Each Category scoring is Most Categories scoring. In Most Categories, teams get wins for every opponent they get a majority of category wins against. To reflect that, with Most Categories scoring, the definition of the overall H-score is the probability of winning a majority of categories (assuming they are independent for the sake of making the calculation less intensive). Most Categories can be added to the blend with Each Category by moving the slider on the sidebar above its default level of 0. </p>
+<figure>
+<p><img alt="Most Categories H-score table" src="../img/hmc.png" /></p>
+<figcaption>
+<p>Top 100% Most Categories H-scores for the first pick, 2024-25 season.</p>
+</figcaption>
+</figure>
+<p>The table above is based on the same dataset as the Each Category version, with different overall H-scores because it has Most Categories set to 100%. With Most Categories scoring, the algorithm is more incentivized to punt, since winning extra categories provides no marginal benefit. This leads to players like Giannis, who benefit greatly from punting, ranking higher. </p>
+<figure>
+<video controls preload="metadata" width="100%" poster="../videos/most-categories-poster.jpg">
+    <source src="../videos/most-categories.mp4" type="video/mp4">
+</video>
+<figcaption>
+<p>An exploration of how to compute the Most Categories objective, and how the underlying 
+mathematical structure incentivizes aggressive punting in the format.</p>
+</figcaption>
+</figure>
+<p>The Head to Head formats can be blended together through the sidebar because they are comparable, and for some leagues, it might make sense to optimize for both at the same time. When the slider is at zero H-scoring optimizes for purely Each Category scoring. If the EC/MC slider is moved all the way to one, it optimizes for purely Most Categories scoring. If the slider is somewhere in between, H-scoring computes and optimizes for both objectives, with weight on Most Categories based on the value of the slider. For example if the slider is at 0.6 it weighs Most Categories scoring at 60% and Each Category scoring at 40%. Setting the slider to somewhere in the middle can make sense for a league that determines regular season standings with Each Category, and does playoffs with Most Categories. </p>
+<figure>
+<p><img alt="Half-and-Half H-scores" src="../img/hhalf.png" /></p>
+<figcaption>
+<p>H-scores with a half-and-half Each Category and Most Categories objective.</p>
+</figcaption>
+</figure>
+<p>With a mixture, overall H-scores are somewhere between typical Each Category numbers and typical Most Categories numbers. It should be noted that H-scores for Most Categories tend to be more extreme, so at 50-50 the algorithm is pulled more by Most Categories scoring. </p>
+<p>Categorical ties are impossible in the model, but with an even number of categories a Most Categories matchup can still end in a tie. By default, the website treats that as half a win. The sidebar also presents an option for a tiebreaker category when the number of categories is even and the Most Categories weight is above zero. The tiebreaker category essentially counts for two, which makes the total odd and gives every matchup a winner. The tiebreaker option only applies to the Most Categories objective. If weight is given to the Each Category objective as well, the tiebreaker category is ignored for that component. </p>
+<details class="note">
+<summary>Why does counting a category twice behave equivalently to having it as a tiebreaker?</summary>
+<p>Doubling points from the tiebreaker changes only the matchups which would otherwise be tied. If a matchup is four-four, the team that gets an extra point from the tiebreaker category wins five-four. If it is five-three or more extreme, the matchup is already won before the tiebreaker point is considered. </p>
+<p>Since the tiebreaker is counted double, it has a different gradient than the other categories. It is decisive either with the total win count of other categories at one less than what is needed or two less than what is needed, so those possibilities are both included in its gradient.  </p>
+<p>Tiebreaker behavior causes complications with understanding what kinds of teams opponents will likely have. It is not reasonable to assume that other teams will be evenly spread across the categories, since the tiebreaker category counts for more. To account for that, the algorithm doubles the baseline weight of the tiebreaker category (also weighted by the EC/MC slider, since total category scoring does not include the tiebreaking mechanism)</p>
+</details>
+<h3 id="rotisserie">Rotisserie</h3>
+<p>Rotisserie is another degree more complicated than Most Categories. When the scoring format is Rotisserie, H-scores become an approximation of the probability to win an entire league. </p>
+<figure>
+<p><img alt="Rotisserie H-score table" src="../img/rototop.png" /></p>
+<figcaption>
+<p>Top Rotisserie H-scores, for the 2024-25 season.</p>
+</figcaption>
+</figure>
+<p>Winning a league is harder than winning a matchup, so H-scores are systematically lower for Rotisserie than for the Head to Head formats. The average is around 8% instead of 50%. </p>
+<p>When the format is Rotisserie, category-level H-scores are expected fantasy point totals per category instead of the likelihood to win a single matchup. One should keep in mind that the expected fantasy point total is just a general average, not what the algorithm expects to happen in a winning scenario. While it may look like it expects to e.g. not earn many points on turnovers with James Harden, it is at least partially banking on volatility allowing it to earn more. </p>
+<p>The ranking for Rotisserie is significantly different from both Each Category and Most Categories. Giannis with his punt build barely hangs within the top twelve, which aligns with the traditional wisdom that punting is not as advantageous for that format. </p>
+<figure>
+<video controls preload="metadata" width="100%" poster="../videos/rotisserie-poster.jpg">
+    <source src="../videos/rotisserie.mp4" type="video/mp4">
+</video>
+<figcaption>
+<p>An explanation of why the Rotisserie format favors balance, using the mathematical principles underlying the H-score
+algorithm for Rotisserie.</p>
+</figcaption>
+</figure>
+<h2 id="detailed-drop-down">Detailed drop-down</h2>
+<p>The main H-score table gives only indirect insight into the strategies that H-scoring wants to use with each candidate player. The H-score details drop-down, triggered by clicking next to a player's name, explains the inner workings of the algorithm for individual players.</p>
+<h3 id="expectations">Expectations</h3>
+<p>The first element of the drop-down is the expectation table. The expectation table breaks down the components of the team on the <a href="../gscores/">G-score</a> basis, showing how previous, current, and future picks compare to other teams. </p>
+<figure>
+<p><img alt="G-score expectation breakdown" src="../img/hexp.png" /></p>
+<figcaption>
+<p>Expectations for a team considering Dyson Daniels in round two, having taken Giannis in round one. Each Category, 2024-25.</p>
+</figcaption>
+</figure>
+<p>"Current diff" represents the G-score differential for the draft so far, including players already drafted in the current round and excluding the candidate player. Teams that have not made their pick for the round are filled in with an estimate of the statistics of their next player. So in this case above, "Current diff" represents other teams' picks so far vs. a team that has already taken Giannis, with estimates filled in for teams that have not yet drafted. "Future diff" is the expected difference between future picks made by the drafter and those made by other teams, based on the strategy adopted by H-scoring. In this case the G-score for Free Throws is heavily negative because the algorithm wants to punt it with future picks. "Current diff" plus the candidate player plus "Future diff" equals the total differential versus other teams, which H-scoring uses to calculate win probabilities.</p>
+<p>"Future diff" depends on the strategy taken by the algorithm for future picks. The elements of that strategy are category weights, flex position shares, and roster allocations, the algorithm's choices for which are shown under the expectation table. </p>
+<h3 id="category-weights">Category weights</h3>
+<p>The second element of the drop-down shows the category weights: the algorithm's choice of weights for future picks, given that the candidate player is taken. </p>
+<figure>
+<p><img alt="Future pick strategy table" src="../img/hstrat.png" /></p>
+<figcaption>
+<p>Category weights for future picks, for a team considering Dyson Daniels after taking Giannis. Each Category, 2024-25. Free Throw % and Threes are the two punted categories with low weight.</p>
+</figcaption>
+</figure>
+<p>Category weights are defined relative to G-scores and calibrated to average 100%. They are optimized based on H-scoring's internal model of how drafting works. It assumes that the drafter will use those weights exactly for candidates going forward, and that those weights will have a certain influence on the aggregate statistics of future picks. </p>
+<figure>
+<video controls preload="metadata" width="100%" poster="../videos/category-weights-poster.jpg">
+  <source src="../videos/category-weights.mp4" type="video/mp4">
+</video>
+<figcaption>
+<p>A 2D visualization of the model for future draft pick statistics. The algorithm uses this model to optimize category weights.</p>
+</figcaption>
+</figure>
+<details class="note">
+<summary>How does the model for future draft picks work mathematically?</summary>
+<p>One of the components of the full H-scoring model is a function that takes in a strategy and outputs expected statistics for future picks based on that strategy. The heart of that function is an adjustment for category weights. </p>
+<p>The original math in the paper is one complicated equation </p>
+<figure>
+<p><img alt="Future pick weight formula" src="../img/crazyformula.png" /></p>
+<figcaption>
+<p>The mathematical model for how category weights change expected statistics.</p>
+</figcaption>
+</figure>
+<p>This model worked reasonably well in practice, but it has a flaw. The resulting weights end up diverging significantly from the gradients relative to the categories, which is a direct way of describing the marginal value of each category. This makes interpretation confusing; the weights don't do a good job of representing what the weights really would be if the manager had to choose based on linear weights in the future. </p>
+<p>The reason that the original model had that problem was that it assumed that degradation in total value was a linear function of how aberrant the weights were. In reality that is not a linear relationship, it is diminishing. That led the weight form to erroneously condense around typical weights. </p>
+<p>To fix that problem, I worked with Claude to design a new model that generates similar categorical expectations and does about as well in testing, with sounder weights. An explanation is available <a href="https://claude.ai/code/artifact/a2553c2f-98a1-4b6e-b770-96f6718189b9">here</a> </p>
+</details>
+<p>One might note that the algorithm does not drive the weight for punted categories all the way to zero. That's because there is still some chance of winning the punted categories, and value in that category increases that chance, however slightly. </p>
+<p>If weight-pinning is enabled in the sidebar under "Model Parameters", category weights can also be set manually using numerical inputs at the top of the H-score table. </p>
+<figure>
+<p><img alt="H-score table with weight pinning" src="../img/hpinning.png" /></p>
+<figcaption>
+<p>H-score table with Free Throw % fixed at a 25% weight. Each Category, 2024-25, first pick.</p>
+</figcaption>
+</figure>
+<p>The algorithm does not modify the pinned weights. It optimizes only the unpinned categories and flex position shares, looking for the best weights to use alongside the pinned weights. Pinning a category to a low weight can be used to force the algorithm to punt a category that it otherwise would not punt, allowing users to explore alternative build options. </p>
+<h3 id="flex-position-strategy">Flex position strategy</h3>
+<p>The third element of the drop-down shows the expected flex position shares. Like the category weights, it shows the algorithm's intended strategy given that the candidate player is taken. </p>
+<figure>
+<p><img alt="Flex position shares" src="../img/hflex.png" /></p>
+<figcaption>
+<p>Expected flex-spot usage for the same Dyson Daniels example as above. The algorithm leans heavily on Power Forwards and Centers. Each Category, 2024-25.</p>
+</figcaption>
+</figure>
+<p>The shares are the expected number of players of each position the algorithm will take with its flex spots. This choice has strategic implications because the algorithm understands that different positions have different statistical tendencies. In the Dyson Daniels example above, the algorithm is leaning heavily on taking Power Forwards and Centers with its flex spots, likely because they tend to have poor Free Throw rates, and that synergizes with the strategy of punting Free Throws.</p>
+<p>The algorithm uses a simple model to estimate how its position strategy will influence its team's category-level strengths. It adds average strengths within fantasy-relevant players for each position (normalized to sum to 0 G-scores for each position) multiplied by the flex position shares. This crudely estimates the expected differential driven by position. Flex positions are optimized simultaneously with category weights. </p>
+<h3 id="roster-allocation-strategy">Roster allocation strategy</h3>
+<p>The fourth element of the drop-down shows how the algorithm intends to arrange its previously chosen players, plus the candidate player, into position slots.</p>
+<figure>
+<p><img alt="Roster assignments" src="../img/hroster.png" /></p>
+<figcaption>
+<p>Roster assignments for the same example — Giannis slots in at Power Forward and the candidate Daniels at Shooting Guard.</p>
+</figcaption>
+</figure>
+<p>Hovering over a player opens a window with their G-scores. </p>
+<figure>
+<p><img alt="G-score hover card" src="../img/hrosterhover.png" /></p>
+<figcaption>
+<p>G-scores for Giannis triggered on hover.</p>
+</figcaption>
+</figure>
+<p>The roster allocation is strategically relevant because it can free up different positions to take with future draft picks. In the example above, the algorithm is choosing to categorize Daniels as a SG, likely because it does not want to take more SGs in general. It figures this out via a sub-algorithm, solving an assignment problem matching players to roster slots.</p>
+<figure>
+<video controls preload="metadata" width="100%" poster="../videos/roster-assignment-poster.jpg">
+  <source src="../videos/roster-assignment.mp4" type="video/mp4">
+</video>
+<figcaption>
+<p>A toy example of the assignment problem used to arrange players by position.</p>
+</figcaption>
+</figure>
+<p>After the assignment problem is solved, the algorithm will have a strategy for what positions it wants to prioritize with future picks- e.g. two guards, one shooting guard, and one center. It then knows how many flex spots it has, and can optimize how it allocates them through the general gradient descent process.</p>
+<h3 id="example-team">Example team</h3>
+<p>If the "Show example team" toggle in the Display section is switched on, the roster table gets filled in with hypothetical future picks. The hypothetical full team is for illustrative purposes only; its expected performance is not part of H-scoring.</p>
+<figure>
+<p><img alt="Roster assignments with an example team" src="../img/hrosterexample.png" /></p>
+<figcaption>
+<p>A hypothetical team with Dyson Daniels as the candidate player. Each Category, 2024-25.</p>
+</figcaption>
+</figure>
+<details class="note">
+<summary>How are example teams created?</summary>
+<p>The example teams are created by optimizing exact player selections.</p>
+<p>Player selections are modeled in the probability space, constrained by round. E.g., if the draft is currently in the first round, the sum of probabilities across second round players cannot exceed one, across the second and third round cannot exceed two, etc.</p>
+<p>Players are assigned to rounds in base H-score order, or a 50-50 blend of H-score rank and ADP when ADPs are available (ADPs will often be more realistic, but don't adapt to specific league settings like H-scores do. The idea behind blending the two is to balance realism and specificity).</p>
+<p>This structure was adapted from a paper by <a href="https://www.degruyterbrill.com/document/doi/10.1515/jqas-2013-0009/html">Becker and Sun</a>. The paper looked at fantasy football, which is relatively easy to describe with a linear objective. In that context, it was possible for the authors to optimize teams with a standard integer program.</p>
+<p>The objective function used for this context is the H-scoring objective, with an added penalty term for shortfalls relative to the category-level win rates expected by H-scoring. Roster positions are held fixed for players already assigned by H-scoring, and H-scoring's flex position allocations are enforced strictly, after rounding. There are also constraints preventing too many players from the same NBA team being chosen for the same fantasy team. This setup is intended to select for realistic teams that might actually be drafted under the general strategy approach outlined by H-scoring.</p>
+<p>The H-scoring objective is not only inherently non-linear but also non-convex. That means that this setup requires an inexact algorithm to optimize a team.</p>
+<p>The inexact optimization process is initialized with a heuristic, selecting the highest-value players according to H-scoring category weights. It then iterates with a Frank-Wolfe process. The Frank-Wolfe process repeatedly steps towards solutions that maximize a linearized version of the objective at the current position in probability space. Once it converges, the final position in probability space is rounded to the nearest exact team.</p>
+<p>The best team from the Frank-Wolfe process is then iteratively checked for individual player swaps that would improve the objective. Usually, a few beneficial swaps are found. Once the team cannot be improved by any one-for-one swaps, it is returned as the final team.</p>
+<p>For auctions, the process is adjusted to constrain by total money spent instead of the round criteria. Generic dollar values are used for the optimization, blended with average auction values when available.</p>
+<p>This process could also be used as an alternative to H-scoring with the category weight model. The reasons that I think it is generally less preferable for selecting players are:</p>
+<ol>
+<li>The decision space is large and scales with the number of draft picks remaining, making it impractical to run on many candidate picks. Potentially, for drafting, the candidate pick itself could be chosen via Frank-Wolfe, but that would discard the starting point that the H-scoring algorithm provides. It would also provide a less flexible user experience.</li>
+<li>This procedure is very sensitive to specific players being available, which cannot be known for certain. Designing an entire strategy around a certain player being available only for them to be picked ahead of schedule could be disastrous.</li>
+<li>In 6v6 testing, refining the top 10 H-scoring results with this process did worse than regular H-scoring. This was a favorable setup for the procedure, since other drafters were using exactly H-scoring, which was how it sorted players into rounds. The fact that the procedure still was not helpful is evidence that the sensitivity problem is a significant limitation for using it to pick players.</li>
+</ol>
+</details>
+<h2 id="input-parameters">Input parameters</h2>
+<p>The H-scoring algorithm is modulated by several parameters available for customization via the sidebar.</p>
+<h3 id="h-scoring-parameters">H-scoring parameters</h3>
+<p>The H-scoring algorithm has two core input parameters- <span class="arithmatex">\(M\)</span> and the number of iterations- which are configurable by the user through the sidebar. Different parameter choices will lead to different H-scoring results.</p>
+<p><span class="arithmatex">\(M\)</span> controls how the algorithm thinks about the landscape of player statistics that it will have to choose from in the future. Roughly, the algorithm assumes that future picks will be choosing between <span class="arithmatex">\(M\)</span> players of similar overall value. Increasing <span class="arithmatex">\(M\)</span> increases the number of options the algorithm thinks it will have and allows it to punt more aggressively. The default value of <span class="arithmatex">\(M\)</span> is 25 which has worked well in testing. </p>
+<p>The number of iterations essentially determines how many times the algorithm can try improving its results. Theoretically the algorithm will be more precise with more iterations; in practice the default of thirty is easily enough.</p>
+<h3 id="position-structure">Position structure</h3>
+<p>The position structure used by the algorithm — also shown in the <a href="#detailed-drop-down">detailed drop-down</a> — is configurable by the user.</p>
+<p><img alt="Position structure configuration" src="../img/positions.png" /></p>
+<p>It is important to note that this position structure should not necessarily be the same as the league's position structure. The league position structure might include bench slots which players can be moved in and out of on a day-to-day basis to make their games count. Players sitting on that kind of bench do matter, so long as the team is balanced enough in terms of position to accommodate all the players who are active on a given day. Those bench slots should be included as Utilities, or perhaps extra Guards or Forwards to ensure adequate balance. The proper configuration will depend on the rules of a league and some degree of personal preference. By default, leagues pull exact roster positions with bench slots converted to utilities, when position structure is available. </p>
+<h2 id="corrections">Corrections</h2>
+<p>H-scoring as presented in the papers has numerous limitations. The website has additional procedures to mitigate some of them.</p>
+<h3 id="reducing-over-confidence-in-the-projection-set">Reducing over-confidence in the projection set</h3>
+<p>H-scoring as described by the papers is fully reliant on a single set of projections. If another drafter takes a player projected to be a poor performer highly, the algorithm will not "doubt itself" and consider the possibility that its projections for that player are too low. It will assume that pick was a poor choice and the drafter who took it will have a bad team. </p>
+<p>This inability to doubt itself can make the algorithm overconfident, believing that its own team is very strong, when its own projections are not necessarily better than those implicitly used by other drafters. As a practical matter this can lead the algorithm to think its team is so strong that the only way to improve is to "un-punt" categories it has given up on, which is probably a bad idea in practice. </p>
+<p>The papers assume that player projections are all known and agreed upon by all the drafters, so they don't address this issue. However, it is so important in practice that the website has its own logic to address it. </p>
+<p>The ℶ (beth) parameter controls the influence of the adjustment. Higher values of ℶ more aggressively regress the strength of teams towards the average during H-scoring. It defaults to 3.</p>
+<details class="note">
+<summary>How is the ℶ adjustment computed?</summary>
+<p>Say that <span class="arithmatex">\(w\)</span> is a vector of the algorithm's naive guess at how likely it is to win each category, before performing gradient descent to optimize a future strategy. Corrected versions are calculated as</p>
+<div class="arithmatex">\[
+w^* = \left[ I_{n \times n} + \frac{\beth}{ n^2}\mathbf{1}_{n \times n}  \right]^{-1} \left[ w + \frac{\beth}{2n} \mathbf{1}_n \right ]
+\]</div>
+<p>Where <span class="arithmatex">\(n\)</span> is the number of categories and ℶ is a parameter. The intuition on what this expression is doing is not immediately clear, but some intuition can be gleaned from the justification below. </p>
+<p>These corrected win rates are then used to reverse engineer an adjusted expectation of the team's current strength, like so: </p>
+<div class="arithmatex">\[
+x^* = \text{CDF}^{-1} \left( w^* \right)
+\]</div>
+<p>Since this adjustment is made before any gradient descent is performed, as the punting strategy changes, the algorithm's opinion of its own team does not change. Re-adjusting the win rates for every iteration of the algorithm based on the current expected win rates would implicitly change the algorithm's opinion of its pre-existing team based on its strategy for the future, which does not make much sense. </p>
+</details>
+<p>The justification for this adjustment is a Bayesian model for updating expectations of team strengths, given drafting decisions made by all drafters. </p>
+<details class="note">
+<summary>What is the justification for the ℶ adjustment?</summary>
+<p>Say that there are prior expectations that </p>
+<ul>
+<li>H-scoring's estimates for how often it will win a category are unbiased, but have some Normally distributed error <span class="arithmatex">\(\epsilon_a\)</span>. </li>
+<li>The team's true average win rate across all categories is a random variable with mean 50% and Normally distributed error <span class="arithmatex">\(\epsilon_b\)</span>. </li>
+</ul>
+<p>This information provides a Bayesian framework for re-calculating adjusted category-level win rates. </p>
+<p>By Bayes' rule, the probability of a certain set of category win rates being correct is proportional to its likelihood times the prior. In this case, the likelihood is </p>
+<div class="arithmatex">\[
+\prod_c \phi (\frac{w^*_c - w_c}{\epsilon_a})
+\]</div>
+<p>And the prior probability is </p>
+<div class="arithmatex">\[
+\phi \left( \frac{\frac{ \sum_c \left( w^*_c - \frac{1}{2} \right)}{n}}{\epsilon_b} \right) = 
+\phi \left( \frac{ \sum_c \left( w^*_c - \frac{1}{2} \right)}{\epsilon_b n} \right)
+\]</div>
+<p>Multiplying them together yields </p>
+<div class="arithmatex">\[
+\left[ \prod_c \phi \left(\frac{w^*_c - w_c}{\epsilon_a} \right) \right] \left[ \phi \left(\frac{ \sum_c \left( w^*_c - \frac{1}{2} \right)}{\epsilon_b n } \right) \right]
+\]</div>
+<p>Taking the natural logarithm of both sides (converting to log odds) simplifies the expression to </p>
+<div class="arithmatex">\[
+\left[ \sum_c \left(\frac{w^*_c - w_c}{\epsilon_a} \right)^2 \right] +  \left(\frac{ \sum_c \left( w^*_c - \frac{1}{2} \right)}{\epsilon_b n} \right)^2 
+\]</div>
+<p>To optimize this, the derivative is set to zero. Applying the chain rule for category d results in</p>
+<div class="arithmatex">\[
+0 = 2 \left(\frac{w^*_d - w_d}{\epsilon_a} \right) \frac{1}{\epsilon_a} + 2 \left(\frac{ \sum_c \left( w^*_c - \frac{1}{2} \right)}{\epsilon_b n} \right) \frac{1}{\epsilon_b n}
+\]</div>
+<p>Isolating <span class="arithmatex">\(w^*_d\)</span>- </p>
+<div class="arithmatex">\[
+2 \left(\frac{w_d}{\epsilon_a^2} \right) - 2 \left(\frac{ \sum_{c \neq d}  \left( w^*_c \right) - \frac{n}{2}}{\epsilon_b n} \right) \frac{1}{\epsilon_b n}= 2 \left(\frac{w^*_d}{\epsilon_a} \right) \frac{1}{\epsilon_a} + 2 \frac{w^*_d}{\epsilon_b^2 n^2}
+\]</div>
+<div class="arithmatex">\[
+2 \left(\frac{w_d}{\epsilon_a^2} \right) - 2 \left(\frac{ \sum_{c \neq d}  \left( w^*_c \right) - \frac{n}{2}}{\epsilon_b n} \right) \frac{1}{\epsilon_b n}= w^*_d \left( 2 \frac{1}{\epsilon_a^2} + 2 \frac{1}{\epsilon_b^2 n^2} \right) 
+\]</div>
+<p>So </p>
+<div class="arithmatex">\[
+w^*_d = \frac{\frac{w_d}{\epsilon_a^2} - \left(\frac{ \sum_{c \neq d}  \left( w^*_c \right) - \frac{n}{2}}{\epsilon_b^2 n^2} \right) }{\frac{1}{\epsilon_a^2} + \frac{1}{\epsilon_b^2 n^2}}
+\]</div>
+<p>With <span class="arithmatex">\(\beth = \frac{\epsilon_a^2}{\epsilon_b^2}\)</span>, this is </p>
+<div class="arithmatex">\[
+w^*_d = \frac{w_d - \beth \left(\frac{ \sum_{c \neq d}  \left( w^*_c \right) - \frac{n}{2}}{ n^2} \right) }{1 + \frac{\beth}{ n^2}}
+\]</div>
+<p>This expression is the best for gleaning intuition behind the adjustment. When the average win rate is high, a larger quantity is subtracted out from all the win rates. If the win rates are all 50%, the numerator becomes <span class="arithmatex">\(\frac{1}{2} + \frac{\beth}{2n^2}\)</span>, cancelling with the denominator and keeping win rates 50%. Higher values of <span class="arithmatex">\(\beth\)</span> increase the importance of the distortion term and decrease the importance of the original win rate.</p>
+<p>While being relatively interpretable, this expression unfortunately cannot be used directly because all of the <span class="arithmatex">\(w^*_c\)</span> values are unknowns. Some linear algebra is required with the vector forms of <span class="arithmatex">\(w\)</span> and <span class="arithmatex">\(w^*\)</span>. </p>
+<p>With <span class="arithmatex">\(J\)</span> as matrix with <span class="arithmatex">\(0\)</span> on all diagonals and <span class="arithmatex">\(1\)</span> on all non-diagonals, the equation can be written </p>
+<div class="arithmatex">\[
+w^* = \frac{w - \frac{\beth J_{n \times n} w^*}{n^2} + \frac{\beth}{2n}\mathbf{1}_n }{\left( 1 + \frac{\beth}{ n^2} \right)}
+\]</div>
+<p>Or </p>
+<div class="arithmatex">\[
+\left( 1 + \frac{\beth}{ n^2}\right) I_{n \times n} w^* = w - \frac{\beth J_{n \times n} w^*}{n^2} + \frac{\beth}{2n} \mathbf{1}_n
+\]</div>
+<p>Isolating <span class="arithmatex">\(w^*\)</span> yields </p>
+<div class="arithmatex">\[
+\left[ \left( 1 + \frac{\beth}{ n^2}\right) I_{n \times n} + \frac{\beth}{ n^2}  J_{n \times n} \right] w^* = w + \frac{\beth}{2n} \mathbf{1}_n
+\]</div>
+<p>The <span class="arithmatex">\(J\)</span> can be simplified out </p>
+<div class="arithmatex">\[
+\left[ I_{n \times n} + \frac{\beth}{ n^2}\mathbf{1}_{n \times n}  \right] w^* = w + \frac{\beth}{2n} \mathbf{1}_n
+\]</div>
+<p>Finally, the matrix can be inverted to yield an expression for <span class="arithmatex">\(w^*\)</span></p>
+<div class="arithmatex">\[
+w^* = \left[ I_{n \times n} + \frac{\beth}{ n^2}\mathbf{1}_{n \times n}  \right]^{-1} \left[ w + \frac{\beth}{2n} \mathbf{1}_n \right ]
+\]</div>
+</details>
+<h3 id="incentivizing-flexible-builds">Incentivizing flexible builds</h3>
+<p>Fantasy basketball analysts often advocate for taking the best player available for the first few picks, and waiting until later to commit to a punt. The idea is to start flexibly, and decide which categories to punt based on which star players end up on the team. A manager would not want to commit to e.g. punting blocks before a star shot-blocker falls into their lap. </p>
+<p>Ideally, the algorithm would model a probability distribution of how circumstances could change, and choose a strategy based on expected value. Instead, for practical reasons, the algorithm is designed to maximize the best strategy under a point estimate of how its strategies would turn out. The lack of understanding of alternate scenarios is a weakness of H-scoring. It does not consider a spectrum of possibilities, so it does not know which strategies are resilient and which are flimsy. </p>
+<p>In general, the flexibility of a strategy is highly related to the degree of punting it involves. A drafter who is only softly planning on punting blocks is likely able to take advantage of a surprising shot-blocker more easily than a drafter planning on hard-punting the category. This motivates a regime of rewarding balance for early picks. The algorithm does this with a technique called regularization, which adds a small penalty for moving category weights away from neutral G-score weights. The algorithm can still plan on a punt, but regularization incentivizes it to punt less harshly, and to choose players who rely less on punting specific categories for their value. This allows the algorithm to more easily pivot if the draft proceeds in a surprising way. </p>
+<p>The strength of that pull is the <span class="arithmatex">\(λ_c\)</span> (lambda) parameter in the sidebar, which defaults to 0.05. Raising it makes early picks hedge harder: weights stay nearer balanced, and the algorithm prefers players whose value does not depend on any one punt landing. Lowering it lets the algorithm commit sooner, which pays off when the punt it picks is the right one and costs flexibility when it is not. Setting it to zero removes the pull entirely, leaving the algorithm free to commit from the first pick. There is also a corresponding <span class="arithmatex">\(λ_p\)</span> for flex position shares, which defaults to 0.8. </p>
+<p>Both λs are scaled by a diminishing factor as the draft goes on. This ensures that regularization applies most for early picks; once the algorithm settles on a strategy, it stops applying as much. </p>
+<details class="note">
+<summary>How does the website enforce regularization?</summary>
+<p>The algorithm regularizes by incorporating an L1 penalty on the difference between category weights and what they would be for standard G-scoring, plus the equivalent mechanism for flex positions. This encourages balanced strategies without overly penalizing punt strategies for players who rely on them. </p>
+<p>The L1 penalty weight decreases as the draft continues, since the importance of flexibility goes down as the team's shape becomes more defined. It goes down as a function of the Gaussian PDF. Specifically, the weight for pick <span class="arithmatex">\(n\)</span> is <span class="arithmatex">\(\lambda\)</span> multiplied by the phi function evaluated at <span class="arithmatex">\(\frac{4n}{k}\)</span> over phi of zero, where <span class="arithmatex">\(k\)</span> is the total number of players to be picked. The hand-wavy motivation for this form of the decay schedule is that as teams stray from average, the probability they will snap back to average with Normally distributed players is roughly Gaussian. In practice, this decay schedule works because it is strong for the first few rounds and tapers to be very small as the draft continues. </p>
+<p>The flex position regularizer has the same scheduler, just scaled up because the flex position numbers tend to vary more. </p>
+</details>
+<h3 id="adjusting-for-other-managers-strategies">Adjusting for other managers' strategies</h3>
+<p>The internal logic of the paper's version of H-scoring does not understand that other drafters may also be trying to punt categories. This will lead to inaccurate projections of other teams and inaccurate projections of which players will be available in later rounds.</p>
+<p>The website's version of the algorithm has a few ways of dealing with this. Predicting the choices of other fantasy managers is difficult because each one has their own habits. Some will punt aggressively, some will prioritize balance, some will chose players from their favorite teams, etc. So the algorithm doesn't try to get in every manager's head; it uses a few heuristic strategies instead. </p>
+<p>The first is a way of predicting what other teams will look like. Before running H-scoring on all candidates, the algorithm is run once to establish a set of top players. Then the process repeats using the identified top players and their corresponding builds as a context in which H-scoring runs. In order to dampen oscillations from one extreme to another, only half of the players are adjusted in each step, and they run against averaged versions of their opponents across previous iterations. This process slowly drifts strategy profiles towards a stationary point. By the end, the algorithm has a rough picture of what an equilibrium might look like in terms of opposing team strategies. Then, during a draft, the algorithm continues to update its expectations by running H-scoring for opponents, and keeping track of what the algorithm expects from future picks for each opponent. </p>
+<p>The strength of the applied prediction is controlled by the <span class="arithmatex">\(C\)</span> (confidence) parameter in the sidebar. For Head to Head formats it defaults to 0.5, which halves the adjustment to expected team statistics; the purpose of that softening is to prevent overconfidence about exact punting builds. Rotisserie always uses full confidence, so the control is hidden there — there is no equivalent uncertainty about punting in Rotisserie, where the main strategy other drafters are expected to adopt is shoring up reliable categories, which is consistent and stable. </p>
+<p>Testing confirms that the prediction adjustment improves the performance of H-scoring against other H-scoring drafters, while degrading performance slightly against pure G-score drafters. Setting C to zero turns the prediction off entirely: every other drafter is treated as a neutral picker with no strategic tendencies.</p>
+<figure>
+<video controls preload="metadata" width="100%" poster="../videos/self-play-poster.jpg">
+  <source src="../videos/self-play.mp4" type="video/mp4">
+</video>
+<figcaption>
+<p>A demonstration of the self-play process that runs before a draft.</p>
+</figcaption>
+</figure>
+<h3 id="checking-multiple-potential-builds">Checking multiple potential builds</h3>
+<p>A fundamental limitation of gradient descent is that it only looks for nearby peaks, potentially missing peaks that are further away. In fantasy basketball terms, it can optimize a build but not evaluate the idea of totally switching to a new build. This means that basic H-scoring can get stuck in one strategy and miss others that would be more promising if it explored them. </p>
+<p>For Each Category and Most Categories, the website mitigates this flaw by choosing its starting point carefully. It checks the objective function in the direction of each punt, and starts its hill-climbing in the neighborhood that scores the best. In practice, this usually aligns the algorithm with the best possible punt. </p>
+<figure>
+<video controls preload="metadata" width="100%" poster="../videos/seed-menu-poster.jpg">
+      <source src="../videos/seed-menu.mp4" type="video/mp4">
+</video>
+<figcaption>
+<p>An example of the multi-starting process</p>
+</figcaption>
+</figure>
+<p>Punting is less common in Rotisserie, so gradient descent does not start at a punt. Instead it starts at a neutral position, slightly tilted towards categories that are robust like Points and Assists. That's where the Rotisserie algorithm generally wants to go, since it thinks it can rely more on luck for the unstable categories like Steals and Turnovers. </p>
+<details class="note">
+<summary>How do we know that this process finds global optimums?</summary>
+<p>There is no theoretical guarantee that this multi-seeding approach finds global optima. However, it is possible to optimize a slightly modified Each Category objective with precise error bounds, and those results can be checked against the gradient descent results. </p>
+<p>The exact algorithm uses sigmoid programming, which applies a branch-and-bound technique to recursively eliminate portions of the decision space. The process produces upper bounds on regions, which can be compared to the best solutions found so far. After enough iterations, the best solution can be brought arbitrarily close to the upper bound. This can take a long time- 10+ minutes for a single candidate in some cases- so it is not practical for actual use, but provides a verifiable optimum to compare against. </p>
+<p>In practice, the gradient ascent approach with multi-seeding almost always finds the global optimum point, in a fraction of the time that sigmoid programming takes. I checked it for multiple candidates in Each Category 9cat and found that multi-seeding as performed by the app always got within 0.01% of the optimum when given an unlimited iteration budget, and was usually close after only 30. </p>
+<p>I think this happens because of three helpful properties of the problem. </p>
+<ol>
+<li>Certain zones within the decision space are quasiconcave. Within particular punting regimes, there are two considerations balancing each other- the vicious cycle of the category-level gradient decreasing as the level decreases, and the diminishing marginal returns from lowering category weight. These two considerations push against each other with negative curvature, resulting in a single peak between the two. Empirically, the space around that peak tends to be quasiconcave, allowing gradient descent to consistently climb it. </li>
+<li>Within the parameters for 9cat, it turns out that generally, the entire decision space usually has only one peak. Gradient descent can get to it from almost any point in the decision space. This might be because across nine dimensions, there are many directions in which a local peak might be surpassed. Gradient descent does not get stuck on suboptimal punts because as it moves in other categories, it can gain some strength in the punted category, eventually bringing it out of the punt. </li>
+<li>The seed menu usually finds a promising starting place for gradient ascent, which is not far from the peak</li>
+</ol>
+<p>The second and third properties happen to be true with the 9cat setup, and are not natural properties of the problem. It is entirely possible with different parameters, like more categories, the approach does not work as well. </p>
+</details>
+<h3 id="adjusting-percentage-categories-for-volume">Adjusting percentage categories for volume</h3>
+<p>The percentage categories cannot be described purely by value differences between teams- volume matters too, when it comes to calculating a probability of winning. A team that has moderate value in a percentage statistic on few attempts has the influence of that value amplified, since there are a smaller number of attempts to dilute the value. Teams with few attempts also have higher variance in general, roughly inversely proportional to their number of attempts. </p>
+<p>This is not accounted for in the original version of H-scoring, which implicitly assumes that all teams are shooting the average number of attempts based on the set of fantasy-relevant players. </p>
+<p>The website's version of H-scoring accounts for volume by scaling the gaps between teams by an adjustment for their volume. Scaling factors are calculated as typical volume over the team's expected team volume. Raw X-scores (the unit of value underlying H-scoring) are then multiplied by that scaling factor, and variance in matchups is inflated by a factor of the average of the scaling factors between the opposing teams. </p>
+<p>Expected volumes are based on players already taken, plus an estimate of the total volume of future players picked. For future players, the algorithm starts with the average volume of players it expects to be taken, and adds a tilt based on category weighting, computed alongside the other tilts. </p>
+<h2 id="other-limitations">Other limitations</h2>
+<p>Some limitations remain intrinsic to the model, at least so far. </p>
+<h3 id="constant-categorical-variance">Constant categorical variance</h3>
+<p>H-scoring does not model category variance based on players. Instead, it assumes that week-to-week variance is the same for all matchups. This is not always accurate, especially when a team is punting a category</p>
+<figure>
+<p><img alt="Expected versus actual category win rates" src="../img/cwinrates.png" /></p>
+<figcaption>
+<p>Win rates, expected by H-scoring vs. actual, from the paper. There is a clear gap at values below 10%.</p>
+</figcaption>
+</figure>
+<p>The paper shows that when hard-punting free throws, teams still win the category surprisingly often. This probably happens because a single poor free throw shooter like Giannis being out can make a team that punts free throws suddenly competitive. On the flipside, teams that punt threes lose even more consistently in the category than predicted. This is because players that don't shoot threes have low variance in how many threes they hit; Rudy Gobert cannot possibly go on a streak from three because he does not attempt them. </p>
+<p>These statistics come from simulations of real seasons using actual player data. Reality is less predictable- players outperform or underperform projections, players get traded or substituted, etc. This increased variance provides a counterbalance to the underprediction for threes. For free throw percent, it compounds, meaning that the algorithm likely underestimates the probability of winning the category despite punting by quite a bit. </p>
+<p>Mathematically, the central reason for the algorithm not taking player-level variance into account is that assuming constant variance makes the math significantly easier. It is what allows the algorithm to think only in the space of differentials- true magnitudes do not matter. </p>
+<p>Another reason is that predicting variance is hard, even ignoring the complicated reality of real fantasy basketball. Most likely, accounting for variance would require individual player-and-category-level forecasts of variance, which would require a massive overhaul of existing forecasting procedures. It might be possible to predict category variance as a function of expected value instead, but that would not necessarily be accurate. </p>
+<h3 id="simplified-player-model">Simplified player model</h3>
+<p>H-scoring's model for what sorts of players will be available in the future is simplified, and may fail to properly account for individual players with exceptional profiles. </p>
+<p>A classic example of an exceptional profile is prime Ben Simmons, who was an All-Star point guard with a free throw rate barely above 60% between 2019 and 2021. Point guards with low free throw percentages are unusual, and can provide prime opportunities for builds that punt free throws. H-scoring's player model lumps all players together into one giant pile, and so is not aware of particular opportunities for punting like Simmons. </p>
+<p>The best fantasy managers are likely aware of these individual players and how they can be composed into a team. Their insight might help them draft better than H-scoring, especially at the beginning of a draft, before the team has settled on a build. </p>
+<h3 id="incomplete-fantasy-model">Incomplete fantasy model</h3>
+<p>The most fundamental flaw of H-scoring is that it does not take into account moves that can be made during an actual fantasy season: streaming players, trading, etc. These introduce considerations that are complex and difficult to incorporate into the drafting process. </p>
+<p>Beyond adding multifaceted strategic considerations to the drafting process, these options also represent important decision points in and of themselves. Expert fantasy managers can greatly improve their chances by making smart moves during the fantasy season. </p>
+<p>The website does have <a href="../season/">season mode</a> for applying H-scoring during the season, but H-scoring relies on projections, and most expert fantasy managers can move faster than projections when a player becomes poised for a breakout. They also understand schedules and streaming rules. So H-scoring by itself is missing quite a bit when it comes to managing a team throughout a season, and human expertise can outperform it easily on that axis. </p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
